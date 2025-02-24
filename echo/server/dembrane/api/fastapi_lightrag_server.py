@@ -1,13 +1,15 @@
 import os
 import logging
-from fastapi import FastAPI, HTTPException, Request
-from pydantic import BaseModel
-from dotenv import load_dotenv
-import uvicorn
 from contextlib import asynccontextmanager
+
+import uvicorn
 
 # Required for async operations in some environments
 import nest_asyncio
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request, HTTPException
+from pydantic import BaseModel
+
 nest_asyncio.apply()
 
 # Load environment variables and set up logging
@@ -28,7 +30,7 @@ class QueryRequest(BaseModel):
     query: str
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:
     # Startup logic: initialize PostgreSQL and create the RAG object.
     postgres_config = {
         "host": os.environ["POSTGRES_HOST"],
@@ -64,13 +66,13 @@ async def lifespan(app: FastAPI):
     # Yield control to let the app run.
     yield
 
-    # Shutdown logic: cleanup if necessary.
-    logging.info("Shutting down FastAPI application.")
+    # # Shutdown logic: cleanup if necessary.
+    # logging.info("Shutting down FastAPI application.")
 
 app = FastAPI(lifespan=lifespan)
 
 @app.post("/insert")
-async def insert_item(request: Request, payload: InsertRequest):
+async def insert_item(request: Request, payload: InsertRequest) -> dict:
     rag: LightRAG = request.app.state.rag
     if rag is None:
         raise HTTPException(status_code=500, detail="RAG object not initialized")
@@ -82,7 +84,7 @@ async def insert_item(request: Request, payload: InsertRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/query")
-async def query_item(request: Request, payload: QueryRequest):
+async def query_item(request: Request, payload: QueryRequest) -> dict:
     rag: LightRAG = request.app.state.rag
     if rag is None:
         raise HTTPException(status_code=500, detail="RAG object not initialized")

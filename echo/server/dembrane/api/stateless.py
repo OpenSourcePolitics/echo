@@ -1,7 +1,8 @@
 from logging import getLogger
 
-from fastapi import APIRouter
+from fastapi import Request, APIRouter, HTTPException
 from litellm import completion
+from lightrag import QueryParam
 from pydantic import BaseModel
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
 
@@ -18,6 +19,24 @@ class TranscriptRequest(BaseModel):
 
 class TranscriptResponse(BaseModel):
     summary: str
+
+
+class InsertRequest(BaseModel):
+    content: str
+
+
+class InsertResponse(BaseModel):
+    status: str
+    result: dict
+
+
+class QueryRequest(BaseModel):
+    query: str
+
+
+class QueryResponse(BaseModel):
+    status: str
+    result: str
 
 
 @StatelessRouter.post("/summarize")
@@ -70,3 +89,29 @@ def generate_summary(transcript: str, system_prompt: str | None, language: str |
     response_content = response["choices"][0]["message"]["content"]
 
     return response_content
+
+
+@StatelessRouter.post("/rag/insert")
+async def insert_item(request: Request, payload: InsertRequest) -> InsertResponse:
+    rag = request.app.state.rag
+    if rag is None:
+        raise HTTPException(status_code=500, detail="RAG object not initialized")
+    try:
+        result = rag.insert(payload.content)
+        return InsertResponse(status="success", result=result)
+    except Exception as e:
+        logger.exception("Insert operation failed")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@StatelessRouter.post("/rag/query")
+async def query_item(request: Request, payload: QueryRequest) -> QueryResponse:
+    rag = request.app.state.rag
+    if rag is None:
+        raise HTTPException(status_code=500, detail="RAG object not initialized")
+    try:
+        result = rag.query(payload.query, param=QueryParam(mode="local"))
+        return QueryResponse(status="success", result=result)
+    except Exception as e:
+        logger.exception("Query operation failed")
+        raise HTTPException(status_code=500, detail=str(e))

@@ -1,3 +1,4 @@
+import os
 import time
 from typing import Any, AsyncGenerator
 from logging import getLogger
@@ -8,10 +9,13 @@ from fastapi import (
     Request,
     HTTPException,
 )
+from lightrag import LightRAG
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware import Middleware
 from fastapi.openapi.utils import get_openapi
+from lightrag.kg.postgres_impl import PostgreSQLDB
+from lightrag.llm.azure_openai import azure_openai_complete
 from starlette.middleware.cors import CORSMiddleware
 
 from dembrane.config import (
@@ -21,6 +25,7 @@ from dembrane.config import (
 )
 from dembrane.sentry import init_sentry
 from dembrane.api.api import api
+from dembrane.audio_lightrag.utils.lightrag_utils import embedding_func
 
 logger = getLogger("server")
 
@@ -30,7 +35,38 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     # startup
     logger.info("starting server")
     init_sentry()
-    # seed_process_resource_queue()
+    
+    # Initialize PostgreSQL and LightRAG
+    postgres_config = {
+        "host": os.environ["POSTGRES_HOST"],
+        "port": os.environ["POSTGRES_PORT"],
+        "user": os.environ["POSTGRES_USER"],
+        "password": os.environ["POSTGRES_PASSWORD"],
+        "database": os.environ["POSTGRES_DATABASE"],
+        "workspace": os.environ["POSTGRES_WORKSPACE"]
+    }
+
+    postgres_db = PostgreSQLDB(config=postgres_config)
+    await postgres_db.initdb()
+    await postgres_db.check_tables()
+
+    working_dir = os.environ["POSTGRES_WORK_DIR"]
+    if not os.path.exists(working_dir):
+        os.makedirs(working_dir)
+
+    _app.state.rag = LightRAG(
+        working_dir=working_dir,
+        llm_model_func=azure_openai_complete,
+        embedding_func=embedding_func,
+        kv_storage="PGKVStorage",
+        doc_status_storage="PGDocStatusStorage",
+        graph_storage="PGGraphStorage",
+        vector_storage="PGVectorStorage",
+        vector_db_storage_cls_kwargs={
+            "cosine_better_than_threshold": 0.7
+        }
+    )
+    logger.info("RAG object has been initialized")
 
     yield
     # shutdown
