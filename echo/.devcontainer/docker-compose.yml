@@ -93,3 +93,18 @@ services:
       - rabbitmq
       - postgres
       - redis
+
+
+  neo4j:
+    image: neo4j:latest
+    volumes:
+        - ./neo4j_data/logs:/logs
+        - ./neo4j_data/config:/config
+        - ./neo4j_data/data:/data
+        - ./neo4j_data/plugins:/plugins
+    environment:
+        - NEO4J_AUTH=neo4j/admin@dembrane
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    restart: always

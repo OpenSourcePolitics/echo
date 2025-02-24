@@ -6,8 +6,8 @@ from lightrag.llm.azure_openai import azure_openai_complete
 from dembrane.audio_lightrag.utils.lightrag_utils import embedding_func, initialize_postgres_db
 import os
 import json
-import nest_asyncio
-nest_asyncio.apply()
+# import nest_asyncio
+# nest_asyncio.apply()
 import logging
 # Configure logging
 logging.basicConfig(level=logging.ERROR, format="%(asctime)s - %(levelname)s - %(message)s")

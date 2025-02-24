@@ -26,6 +26,8 @@ from dembrane.config import (
 from dembrane.sentry import init_sentry
 from dembrane.api.api import api
 from dembrane.audio_lightrag.utils.lightrag_utils import embedding_func
+import nest_asyncio
+nest_asyncio.apply()
 
 logger = getLogger("server")
 
@@ -43,7 +45,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
         "user": os.environ["POSTGRES_USER"],
         "password": os.environ["POSTGRES_PASSWORD"],
         "database": os.environ["POSTGRES_DATABASE"],
-        "workspace": os.environ["POSTGRES_WORKSPACE"]
+        # "workspace": os.environ["POSTGRES_WORKSPACE"]
     }
 
     postgres_db = PostgreSQLDB(config=postgres_config)
@@ -66,6 +68,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
             "cosine_better_than_threshold": 0.7
         }
     )
+    
     logger.info("RAG object has been initialized")
 
     yield
