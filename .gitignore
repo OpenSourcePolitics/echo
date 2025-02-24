@@ -2,3 +2,4 @@ echo/docker-compose.coolify.yml
 echo/.devcontainer/neo4j_data/*
 echo/docker-compose.coolify.yml
 echo/server/lightrag.log
+*.coolify.yml
