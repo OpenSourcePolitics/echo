@@ -50,6 +50,26 @@ dependencies = [
     "types-requests>=2.32.0.20240602",
     "types-python-jose>=3.3.4.20240106",
     "litellm>=1.59.9",
+    # Additional Dependencies
+    "lightrag-hku==1.1.7",
+    "nest-asyncio==1.6.0",
+    "pydantic==2.10.6",
+    "pydub==0.25.1",
+    "pytest>=8.3.4",
+    "PyYAML==6.0.2",
+    # Network and HTTP
+    "aiohttp",
+    # Configuration
+    "configparser",
+    # Data and Analysis
+    "networkx",
+    "pipmaster",
+    # Utils
+    "setuptools",
+    "tenacity",
+    # LLM Tools
+    "tiktoken",
+    "asyncpg"
     # "trankit @ git+https://github.com/nlp-uoregon/trankit",
 ]
 

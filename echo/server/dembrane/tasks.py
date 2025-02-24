@@ -1,6 +1,5 @@
 # mypy: disable-error-code="no-untyped-def"
 from typing import List
-
 from celery import Celery, chain, chord, group, signals  # type: ignore
 from sentry_sdk import capture_exception
 from celery.utils.log import get_task_logger  # type: ignore
@@ -34,6 +33,7 @@ from dembrane.quote_utils import (
     cluster_quotes_using_aspect_centroids,
 )
 from dembrane.api.stateless import generate_summary
+from dembrane.audio_lightrag.main.run_etl import run_etl_pipeline as run_etl_pipeline_audio_lightrag
 
 logger = get_task_logger("celery_tasks")
 
@@ -755,16 +755,21 @@ def task_finish_conversation_hook(self, conversation_id: str):
         for chunk in conversation_data["chunks"]:
             transcript_str += chunk["transcript"]
 
-        summary = generate_summary(transcript_str, None, language if language else "nl")
-
-        directus.update_item(
-            collection_name="conversation",
-            item_id=conversation_id,
-            item_data={
-                "summary": summary,
-            },
-        )
+        # summary = generate_summary(transcript_str, None, language if language else "nl")
+        
+        # directus.update_item(
+        #     collection_name="conversation",
+        #     item_id=conversation_id,
+        #     item_data={
+        #         "summary": summary,
+        #     },
+        # )
+        run_etl_pipeline_audio_lightrag([conversation_id])
 
     except Exception as e:
         logger.error(f"Error: {e}")
         raise self.retry(exc=e) from e
+
+
+if __name__ == "__main__":
+    task_finish_conversation_hook.apply(["7ed3f387-eda0-4ae4-a1da-7ce0f6e1dd93"])

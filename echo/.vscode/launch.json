@@ -1,12 +1,25 @@
 {
   "version": "0.2.0",
-  "configurations": [
+  "configurations": [    
+    {
+    "name": "Python Debugger: Tasks",
+    "type": "debugpy",
+    "request": "launch",
+    "module": "dembrane.tasks",
+    "cwd": "${workspaceFolder}/server"
+  },
     {
       "name": "Python Debugger: Server",
       "type": "debugpy",
       "request": "launch",
-      "module": "dembrane.main",
-      "cwd": "${workspaceFolder}/server"
+      "program": "${workspaceFolder}/server/dembrane/main.py",
+      "cwd": "${workspaceFolder}/server",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/server"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "python": "/root/miniconda3/envs/dembrane/bin/python"
     },
     {
       "name": "Attach to Python Functions",
