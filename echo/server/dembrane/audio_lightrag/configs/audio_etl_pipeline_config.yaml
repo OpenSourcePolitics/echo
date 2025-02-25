@@ -1,4 +1,4 @@
-download_root_dir: 'dembrane/audio_lightrag/data/Temp_Downloads'
-segment_root_dir: 'dembrane/audio_lightrag/data/Temp_Segments'
+download_root_dir: 'server/dembrane/audio_lightrag/data/Temp_Downloads'
+segment_root_dir: 'server/dembrane/audio_lightrag/data/Temp_Segments'
 audio_url: "https://api.dembrane.com/api/conversations/{conversation_id}/chunks/{chunk_id}/content"
 max_audio_file_size_mb: 15

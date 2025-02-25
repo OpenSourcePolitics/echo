@@ -6,8 +6,8 @@ accepted_formats:
   #- mp4
 
 # Output paths for the resulting CSV files (or any other destination you choose)
-conversation_output_path: "dembrane/audio_lightrag/data/directus_etl_data/conversation.csv"
-project_output_path: "dembrane/audio_lightrag/data/directus_etl_data/project.csv"
+conversation_output_path: "server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv"
+project_output_path: "server/dembrane/audio_lightrag/data/directus_etl_data/project.csv"
 
 project_request:
   query:

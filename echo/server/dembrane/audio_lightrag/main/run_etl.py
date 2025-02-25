@@ -22,8 +22,8 @@ def run_etl_pipeline(conv_id_list: list[str] = None) -> None:
 
     # Initialize process tracker
     process_tracker = ProcessTracker(
-        conversation_df=pd.read_csv('dembrane/audio_lightrag/data/directus_etl_data/conversation.csv'),
-        project_df=pd.read_csv('dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id')
+        conversation_df=pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv'),
+        project_df=pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id')
     )
 
     # Run Audio ETL

@@ -16,7 +16,7 @@ def test_contaxtual_chunk_etl_pipeline(conversation_df: pd.DataFrame, project_df
     contextual_chunk_pipeline = ContaxtualChunkETLPipeline(process_tracker)
     contextual_chunk_pipeline.run()
     import json 
-    with open('dembrane/audio_lightrag/data/JSON_Output/' + test_conversation_id + '.json') as f:
+    with open('server/dembrane/audio_lightrag/data/JSON_Output/' + test_conversation_id + '.json') as f:
         responses = json.load(f)
     assert (len(responses) == len(process_tracker().segment.unique()))
     assert set(responses[test_conversation_id + '_0.0'].keys()) == set(['TRANSCRIPT','CONTEXTUAL_TRANSCRIPT'])

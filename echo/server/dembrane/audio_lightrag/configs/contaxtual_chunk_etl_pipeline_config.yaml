@@ -1,3 +1,3 @@
-segment_root_dir: 'dembrane/audio_lightrag/data/Temp_Segments'
-output_json_filepath: 'dembrane/audio_lightrag/data/JSON_Output'
+segment_root_dir: 'server/dembrane/audio_lightrag/data/Temp_Segments'
+output_json_filepath: 'server/dembrane/audio_lightrag/data/JSON_Output'
 conversation_history_num: 10

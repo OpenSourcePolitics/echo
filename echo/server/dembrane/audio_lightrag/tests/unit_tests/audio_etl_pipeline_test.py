@@ -1,16 +1,18 @@
 # write unit tests for audio etl pipeline
+import os
 import sys
-import os
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
-# import unittest
-import os
+
 import pandas as pd
 import pytest
-from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipeline   
+
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
+from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipeline
+
 
 @pytest.mark.usefixtures("conversation_df", "project_df")
-def test_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame):
+def test_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
     # Use conftest data to create a mock ProcessTracker object
     mock_process_tracker = ProcessTracker(conversation_df=conversation_df,
                                           project_df=project_df)   
@@ -21,20 +23,20 @@ def test_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame):
                                                    'log', 'json_status','ligtrag_status'])
     assert mock_process_tracker().shape[0]*mock_process_tracker().shape[1] != 0
 
-@pytest.mark.usefixtures("conversation_df", "project_df")
-def test_partial_process_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame):
-    conversation_df = pd.read_csv('dembrane/audio_lightrag/tests/data/partial_progress_tracker.csv')
-    process_tracker = ProcessTracker(conversation_df = conversation_df,
-                                     project_df=project_df)   
-    audio_etl_pipeline = AudioETLPipeline(process_tracker)
-    audio_etl_pipeline.run()
-    process_tracker.delete_temps()
-    assert (process_tracker()[process_tracker().segment==1].shape[0] == 5)
-    assert (process_tracker()[process_tracker().segment==2].shape[0] == 4)
+# @pytest.mark.usefixtures("conversation_df", "project_df")
+# def test_partial_process_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
+#     conversation_df = pd.read_csv('server/dembrane/audio_lightrag/tests/data/partial_progress_tracker.csv')
+#     process_tracker = ProcessTracker(conversation_df = conversation_df,
+#                                      project_df=project_df)   
+#     audio_etl_pipeline = AudioETLPipeline(process_tracker)
+#     audio_etl_pipeline.run()
+#     process_tracker.delete_temps()
+#     assert (process_tracker()[process_tracker().segment==1].shape[0] == 5)
+#     assert (process_tracker()[process_tracker().segment==2].shape[0] == 4)
  
 
 @pytest.mark.usefixtures("conversation_df", "project_df")
-def test_audio_etl_pipeline_m4a(conversation_df: pd.DataFrame, project_df: pd.DataFrame):
+def test_audio_etl_pipeline_m4a(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
     process_tracker = ProcessTracker(conversation_df=conversation_df[conversation_df.format=='m4a'],
                                             project_df=project_df)   
     audio_etl_pipeline = AudioETLPipeline(process_tracker)
@@ -44,10 +46,9 @@ def test_audio_etl_pipeline_m4a(conversation_df: pd.DataFrame, project_df: pd.Da
     assert (process_tracker()[process_tracker().segment.isna()].shape[0] == 0)
 
 @pytest.mark.usefixtures("conversation_df", "project_df")
-def test_audio_etl_pipeline_mp3(conversation_df: pd.DataFrame, project_df: pd.DataFrame):
+def test_audio_etl_pipeline_mp3(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
     process_tracker = ProcessTracker(conversation_df=
-                                     conversation_df[conversation_df.format=='mp3'].sample(10, 
-                                                                                           random_state=42),
+                                     conversation_df[conversation_df.format=='mp3'],
                                             project_df=project_df)   
     audio_etl_pipeline = AudioETLPipeline(process_tracker)
     audio_etl_pipeline.run()

@@ -2,17 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Python: FastAPI Server",
-      "type": "debugpy",
+      "name": "Python: ProcessTracker Debug",
+      "type": "python",
       "request": "launch",
-      "program": "${workspaceFolder}/server/dembrane/main.py",
+      "program": "dembrane/audio_lightrag/tests/unit_tests/directus_etl_pipeline_test.py",
       "cwd": "${workspaceFolder}/server",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/server",
+        "PYTHONPATH": "${workspaceFolder}/server"
       },
       "console": "integratedTerminal",
-      "justMyCode": false,
-      "python": "/root/.rye/shims/python"
+      "justMyCode": "false"
     }
   ]
 }

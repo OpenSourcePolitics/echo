@@ -1,18 +1,20 @@
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple, Optional
+
 import yaml
 import pandas as pd
 from dotenv import load_dotenv
 from directus_sdk_py import DirectusClient
 
-from dembrane.config import DIRECTUS_BASE_URL, DIRECTUS_TOKEN
+from dembrane.config import DIRECTUS_TOKEN, DIRECTUS_BASE_URL
+
 
 class DirectusETLPipeline:
     """
     A class for extracting, transforming, and loading data from Directus.
     """
     def __init__(self, 
-                 config_path: str = "dembrane/audio_lightrag/configs/directus_etl_pipeline_config.yaml") -> None:
+                 config_path: str = "server/dembrane/audio_lightrag/configs/directus_etl_pipeline_config.yaml") -> None:
         # Load environment variables from the .env file
         load_dotenv()
 
@@ -106,8 +108,8 @@ class DirectusETLPipeline:
         # if os.path.isfile(project_output_path):
         #     pd.read_csv(project_output_path).append(project_df).to_csv(project_output_path) 
         # else: project_df.to_csv(project_output_path)
-        conversation_df.rename(columns = {"id": "conversation_id"}).to_csv(conversation_output_path)
-        project_df.to_csv(project_output_path)
+        conversation_df.rename(columns = {"id": "conversation_id"}).to_csv(conversation_output_path, index=False)
+        project_df.to_csv(project_output_path, index=True)
 
         print(f"Conversation data saved to {conversation_output_path}")
         print(f"Project data saved to {project_output_path}")

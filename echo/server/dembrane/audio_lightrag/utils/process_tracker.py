@@ -1,7 +1,7 @@
 class ProcessTracker:
     def __init__(self, 
                  conversation_df, 
-                 conversation_df_path = 'dembrane/audio_lightrag/data/progress_tracker.csv', 
+                 conversation_df_path = 'server/dembrane/audio_lightrag/data/progress_tracker.csv', 
                  project_df = None,
                  ):
         """
@@ -77,7 +77,7 @@ class ProcessTracker:
         return self.project_df
     
     def delete_temps(self,
-                     temp_dir_lis = ['dembrane/audio_lightrag/data/Temp_Downloads','dembrane/audio_lightrag/data/Temp_Segments']
+                     temp_dir_lis = ['server/dembrane/audio_lightrag/data/Temp_Downloads','server/dembrane/audio_lightrag/data/Temp_Segments']
                      ) -> None:
         import shutil
         import os

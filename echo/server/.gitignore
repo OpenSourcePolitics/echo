@@ -13,4 +13,4 @@ dist
 trankit_cache
 
 mypy_cache
-server/dembrane/audio_lightrag/data/*
+server/server/dembrane/audio_lightrag/data/*

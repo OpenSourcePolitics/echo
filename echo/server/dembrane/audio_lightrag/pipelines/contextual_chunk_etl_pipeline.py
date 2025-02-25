@@ -12,7 +12,7 @@ import pandas as pd
 class ContaxtualChunkETLPipeline:
     def __init__(self,
                  process_tracker,
-                 config_path = 'dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml',
+                 config_path = 'server/dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml',
                  ):
         # Env loads
         # load_dotenv()
@@ -118,9 +118,9 @@ if __name__ == "__main__":
     # text_structuring_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
     # pipeline = ContaxtualChunkETLPipeline(audio_model_endpoint_uri, audio_model_api_key, audio_model_api_version,
     #              text_structuring_model_endpoint_uri, text_structuring_model_api_key, text_structuring_model_api_version)
-    process_tracker = ProcessTracker(pd.read_csv('dembrane/audio_lightrag/data/progress_tracker.csv'), 
-                                     project_df = pd.read_csv('dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id'))
-    pipeline = ContaxtualChunkETLPipeline('/home/azureuser/cloudfiles/code/Users/arindamroy11235/experiments/dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml',
+    process_tracker = ProcessTracker(pd.read_csv('server/dembrane/audio_lightrag/data/progress_tracker.csv'), 
+                                     project_df = pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id'))
+    pipeline = ContaxtualChunkETLPipeline('/home/azureuser/cloudfiles/code/Users/arindamroy11235/experiments/server/dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml',
                                           process_tracker)
     pipeline.run()
     

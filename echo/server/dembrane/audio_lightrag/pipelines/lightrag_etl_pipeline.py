@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.ERROR, format="%(asctime)s - %(levelname)s - %
 class LightragETLPipeline:
     def __init__(self, 
                  process_tracker, 
-                 config_path: str = "dembrane/audio_lightrag/configs/lightrag_etl_pipeline_config.yaml",
+                 config_path: str = "server/dembrane/audio_lightrag/configs/lightrag_etl_pipeline_config.yaml",
                  api_base_url = "http://localhost:8000" ):
         self.config = self.load_config(config_path)
         self.process_tracker = process_tracker
@@ -79,8 +79,8 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
     load_dotenv()
 
-    process_tracker = ProcessTracker(pd.read_csv('dembrane/audio_lightrag/tests/data/test_conversation_df.csv').sample(5, random_state=42), 
-                                     project_df = pd.read_csv('dembrane/audio_lightrag/tests/data/test_project_df.csv').set_index('id'))
+    process_tracker = ProcessTracker(pd.read_csv('server/dembrane/audio_lightrag/tests/data/test_conversation_df.csv').sample(5, random_state=42), 
+                                     project_df = pd.read_csv('server/dembrane/audio_lightrag/tests/data/test_project_df.csv').set_index('id'))
     
     pipeline = LightragETLPipeline(process_tracker, 
                                    api_base_url = "http://localhost:8010")

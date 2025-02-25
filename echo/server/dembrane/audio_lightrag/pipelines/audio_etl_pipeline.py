@@ -5,7 +5,7 @@ from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
 class AudioETLPipeline:
     def __init__(self, process_tracker: ProcessTracker, 
-                 config_path: str = "dembrane/audio_lightrag/configs/audio_etl_pipeline_config.yaml") -> None:
+                 config_path: str = "server/dembrane/audio_lightrag/configs/audio_etl_pipeline_config.yaml") -> None:
         """
         Initialize the AudioETLPipeline.
 
@@ -111,6 +111,6 @@ if __name__ == "__main__":
     import pandas as pd
     from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
     process_tracker = ProcessTracker(pd.read_csv(
-        'dembrane/audio_lightrag/data/directus_etl_data/sample_conversation.csv'))
+        'server/dembrane/audio_lightrag/data/directus_etl_data/sample_conversation.csv'))
     pipeline = AudioETLPipeline(process_tracker)
     pipeline.run() 
