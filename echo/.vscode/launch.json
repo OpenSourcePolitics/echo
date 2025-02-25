@@ -1,35 +1,18 @@
 {
   "version": "0.2.0",
-  "configurations": [    
+  "configurations": [
     {
-    "name": "Python Debugger: Tasks",
-    "type": "debugpy",
-    "request": "launch",
-    "module": "dembrane.tasks",
-    "cwd": "${workspaceFolder}/server"
-  },
-    {
-      "name": "Python Debugger: Server",
+      "name": "Python: FastAPI Server",
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/server/dembrane/main.py",
       "cwd": "${workspaceFolder}/server",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/server"
+        "PYTHONPATH": "${workspaceFolder}/server",
       },
       "console": "integratedTerminal",
-      "justMyCode": true,
-      "python": "/root/miniconda3/envs/dembrane/bin/python"
-    },
-    {
-      "name": "Attach to Python Functions",
-      "type": "debugpy",
-      "request": "attach",
-      "connect": {
-        "host": "localhost",
-        "port": 9091
-      },
-      "preLaunchTask": "func: host start"
+      "justMyCode": false,
+      "python": "/root/.rye/shims/python"
     }
   ]
 }

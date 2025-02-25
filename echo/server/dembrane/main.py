@@ -30,7 +30,7 @@ import nest_asyncio
 nest_asyncio.apply()
 
 logger = getLogger("server")
-
+print('**********', os.environ.get("NEO4J_USERNAME"))
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
@@ -62,7 +62,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
         embedding_func=embedding_func,
         kv_storage="PGKVStorage",
         doc_status_storage="PGDocStatusStorage",
-        graph_storage="PGGraphStorage",
+        graph_storage="Neo4JStorage",
         vector_storage="PGVectorStorage",
         vector_db_storage_cls_kwargs={
             "cosine_better_than_threshold": 0.7

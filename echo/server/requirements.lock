@@ -166,6 +166,7 @@ mypy==1.10.0
 mypy-extensions==1.0.0
     # via mypy
     # via typing-inspect
+neo4j==5.28.1
 nest-asyncio==1.6.0
 networkx==3.4.2
 numpy==1.26.4
@@ -229,6 +230,7 @@ python-jose==3.3.0
 python-multipart==0.0.9
 pytz==2024.1
     # via flower
+    # via neo4j
     # via pandas
 pyyaml==6.0.2
     # via huggingface-hub

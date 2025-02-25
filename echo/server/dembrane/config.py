@@ -122,3 +122,13 @@ if BUILD_VERSION != "dev":
     ENVIRONMENT = "production"
 
 logger.debug(f"ENVIRONMENT: {ENVIRONMENT}")
+
+# Neo4j configuration
+NEO4J_URI = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
+logger.debug(f"NEO4J_URI: {NEO4J_URI}")
+
+NEO4J_USERNAME = os.environ.get("NEO4J_USERNAME", "neo4j")
+logger.debug(f"NEO4J_USERNAME: {NEO4J_USERNAME}")
+
+NEO4J_PASSWORD = os.environ.get("NEO4J_PASSWORD", "admin@dembrane")
+logger.debug("NEO4J_PASSWORD: set")

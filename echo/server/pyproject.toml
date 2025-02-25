@@ -69,7 +69,8 @@ dependencies = [
     "tenacity",
     # LLM Tools
     "tiktoken",
-    "asyncpg"
+    "asyncpg",
+    "neo4j"
     # "trankit @ git+https://github.com/nlp-uoregon/trankit",
 ]
 

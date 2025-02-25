@@ -29,6 +29,18 @@ services:
     volumes:
       - ./rabbitmq_data:/var/lib/rabbitmq
 
+  neo4j:
+    image: neo4j:latest
+    volumes:
+      - ./neo4j_data/logs:/logs
+      - ./neo4j_data/config:/config
+      - ./neo4j_data/data:/data
+      - ./neo4j_data/plugins:/plugins
+    environment:
+      - NEO4J_AUTH=neo4j/admin@dembrane
+    network_mode: service:postgres
+    restart: unless-stopped
+
   directus:
     build:
       context: ../directus
@@ -84,6 +96,8 @@ services:
       - DISABLE_SENTRY=1
       - SERVE_API_DOCS=1
       - DISABLE_REDACTION=1
+      - NEO4J_URL=bolt://neo4j:7687
+      
     volumes:
       - ../..:/workspaces:cached
       - /var/run/docker.sock:/var/run/docker.sock
@@ -93,18 +107,6 @@ services:
       - rabbitmq
       - postgres
       - redis
+      - neo4j
 
 
-  neo4j:
-    image: neo4j:latest
-    volumes:
-        - ./neo4j_data/logs:/logs
-        - ./neo4j_data/config:/config
-        - ./neo4j_data/data:/data
-        - ./neo4j_data/plugins:/plugins
-    environment:
-        - NEO4J_AUTH=neo4j/admin@dembrane
-    ports:
-      - "7474:7474"
-      - "7687:7687"
-    restart: always
