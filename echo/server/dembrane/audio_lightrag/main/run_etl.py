@@ -20,7 +20,7 @@ from dembrane.audio_lightrag.pipelines.contextual_chunk_etl_pipeline import (
 
 load_dotenv()
 
-def run_etl_pipeline(conv_id_list: list[str] = None) -> None:
+def run_etl_pipeline(conv_id_list: list[str]) -> None:
     """
     Runs the complete ETL pipeline including Directus, Audio, Contextual Chunk, and Lightrag processes.
     """

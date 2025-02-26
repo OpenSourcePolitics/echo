@@ -1,9 +1,15 @@
+import os
+import shutil
+
+import pandas as pd
+
+
 class ProcessTracker:
     def __init__(self, 
-                 conversation_df, 
-                 conversation_df_path = 'server/dembrane/audio_lightrag/data/progress_tracker.csv', 
-                 project_df = None,
-                 ):
+                 conversation_df: pd.DataFrame, 
+                 project_df: pd.DataFrame,
+                 conversation_df_path: str = 'server/dembrane/audio_lightrag/data/progress_tracker.csv', 
+                 ) -> None:
         """
         Initialize the ProcessTracker.
 
@@ -28,10 +34,10 @@ class ProcessTracker:
         self.project_df = project_df
 
 
-    def __call__(self):
+    def __call__(self) -> pd.DataFrame:
         return self.df
     
-    def update_download_status(self, conversation_id, chunk_id, status):
+    def update_download_status(self, conversation_id: int, chunk_id: int, status: str) -> None:
         """
         Update the download status of a given conversation and chunk id.
 
@@ -44,7 +50,7 @@ class ProcessTracker:
                     (self.df.chunk_id == chunk_id), 'download_status'] = status
         self.save_df()
 
-    def update_segment(self, dict):
+    def update_segment(self, dict: dict) -> None:
         """
         Update the segment column of the DataFrame with the given
         dictionary.
@@ -59,28 +65,26 @@ class ProcessTracker:
         # Save the DataFrame
         self.save_df()
         
-    def update_json_status(self, conversation_id, segment, status):
+    def update_json_status(self, conversation_id: int, segment: int, status: str) -> None:
         self.df.loc[(self.df.conversation_id == conversation_id) & (self.df.segment == segment), 'json_status'] = status
         self.save_df()
 
-    def update_ligtrag_status(self, conversation_id, status):
+    def update_ligtrag_status(self, conversation_id: int, status: str) -> None:
         self.df.loc[(self.df.conversation_id == conversation_id) , 'ligtrag_status'] = status
         self.save_df()
 
-    def save_df(self):
+    def save_df(self) -> None:
         """
         Save the DataFrame to the given path.
         """
         self.df.to_csv(self.df_path, index=False)
     
-    def get_project_df(self): 
+    def get_project_df(self) -> pd.DataFrame: 
         return self.project_df
     
     def delete_temps(self,
-                     temp_dir_lis = ['server/dembrane/audio_lightrag/data/Temp_Downloads','server/dembrane/audio_lightrag/data/Temp_Segments']
+                     temp_dir_lis: list[str] = ['server/dembrane/audio_lightrag/data/Temp_Downloads','server/dembrane/audio_lightrag/data/Temp_Segments']
                      ) -> None:
-        import shutil
-        import os
         for temp_dir in temp_dir_lis:
             shutil.rmtree(temp_dir)
             os.makedirs(temp_dir)

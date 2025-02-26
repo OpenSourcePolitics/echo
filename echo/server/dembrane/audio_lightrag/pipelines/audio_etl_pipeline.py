@@ -40,7 +40,7 @@ class AudioETLPipeline:
             return yaml.safe_load(file)
 
 
-    def extract(self):
+    def extract(self) -> None:
         # Get unique project and conversation IDs
         zip_unique = list(set(zip(self.process_tracker_df.project_id, 
                                   self.process_tracker_df.conversation_id)))
@@ -59,7 +59,7 @@ class AudioETLPipeline:
                 download_file_path = download_chunk_audio_file(conversation_id, chunk_id, 
                                                                file_extension, self.download_root_dir,
                                                                self.audio_url)
-                if file_extension == 'mp4':pass # TODO: implement mp4 to wav
+                if file_extension == 'mp4' : pass # TODO: implement mp4 to wav
 
                 # Update process tracker with download status
                 if download_file_path is not None:
@@ -67,7 +67,7 @@ class AudioETLPipeline:
                 else:
                     self.process_tracker.update_download_status(conversation_id, chunk_id, 'fail')
 
-    def transform(self):
+    def transform(self) -> None:
         downloaded_process_tracker_df = self.process_tracker_df[
             (self.process_tracker_df.download_status == 'pass') &
             (self.process_tracker_df.segment.isna() == True)]	
@@ -99,21 +99,23 @@ class AudioETLPipeline:
                                     for file_path in processed_chunk_file_path_li}  # chunk to counter
                     self.process_tracker.update_segment(segment_dict)
                     counter = counter + 1
-            [os.remove(os.path.join(self.download_root_dir,
-                          conversation_id + '_' + chunk_id + '.wav'))
-                          for chunk_id in chunk_li]
+            # Remove downloaded files after processing
+            for chunk_id in chunk_li:
+                os.remove(os.path.join(self.download_root_dir,
+                         conversation_id + '_' + chunk_id + '.wav'))
         
-    def load(self):pass
+    def load(self) -> None:
+        pass
 
-    def run(self):
+    def run(self) -> None:
         self.extract()
         self.transform()
         self.load()
 
-if __name__ == "__main__":
-    import pandas as pd
-    from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
-    process_tracker = ProcessTracker(pd.read_csv(
-        'server/dembrane/audio_lightrag/data/directus_etl_data/sample_conversation.csv'))
-    pipeline = AudioETLPipeline(process_tracker)
-    pipeline.run() 
+# if __name__ == "__main__":
+#     import pandas as pd
+#     from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
+#     process_tracker = ProcessTracker(pd.read_csv(
+#         'server/dembrane/audio_lightrag/data/directus_etl_data/sample_conversation.csv'))
+#     pipeline = AudioETLPipeline(process_tracker)
+#     pipeline.run() 
