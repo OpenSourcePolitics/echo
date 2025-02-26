@@ -10,8 +10,8 @@ class TestDirectusETLPipeline(unittest.TestCase):
         self.directus_etl_pipeline.run()
         self.assertTrue(os.path.exists("server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv"))
         self.assertTrue(os.path.exists("server/dembrane/audio_lightrag/data/directus_etl_data/project.csv"))
-        # os.remove("server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv")
-        # os.remove("server/dembrane/audio_lightrag/data/directus_etl_data/project.csv")
+        os.remove("server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv")
+        os.remove("server/dembrane/audio_lightrag/data/directus_etl_data/project.csv")
     
 
 if __name__ == '__main__':
