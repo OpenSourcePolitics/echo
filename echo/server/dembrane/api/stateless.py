@@ -2,9 +2,9 @@ from logging import getLogger
 
 from fastapi import Request, APIRouter, HTTPException
 from litellm import completion
-from lightrag import QueryParam
 from pydantic import BaseModel
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate
+from lightrag.lightrag import QueryParam
 
 logger = getLogger("api.stateless")
 
@@ -101,7 +101,7 @@ async def insert_item(request: Request, payload: InsertRequest) -> InsertRespons
         return InsertResponse(status="success", result=result)
     except Exception as e:
         logger.exception("Insert operation failed")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @StatelessRouter.post("/rag/query")
@@ -114,4 +114,4 @@ async def query_item(request: Request, payload: QueryRequest) -> QueryResponse:
         return QueryResponse(status="success", result=result)
     except Exception as e:
         logger.exception("Query operation failed")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e)) from e
