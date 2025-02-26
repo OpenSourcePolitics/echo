@@ -1,6 +1,15 @@
 import pandas as pd
 from dotenv import load_dotenv
 
+from dembrane.config import (
+    AZURE_OPENAI_AUDIOMODEL_API_KEY,
+    AZURE_OPENAI_AUDIOMODEL_ENDPOINT,
+    AZURE_OPENAI_AUDIOMODEL_API_VERSION,
+    AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME,
+    AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_KEY,
+    AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT,
+    AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_VERSION,
+)
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipeline
 from dembrane.audio_lightrag.pipelines.directus_etl_pipeline import DirectusETLPipeline
@@ -31,7 +40,15 @@ def run_etl_pipeline(conv_id_list: list[str] = None) -> None:
     audio_pl.run()
 
     # Run Contextual Chunk ETL
-    contextual_chunk_pl = ContextualChunkETLPipeline(process_tracker)
+    contextual_chunk_pl = ContextualChunkETLPipeline(process_tracker,
+                                                     audio_model_endpoint_uri = str(AZURE_OPENAI_AUDIOMODEL_ENDPOINT),
+                                                     audio_model_api_key = str(AZURE_OPENAI_AUDIOMODEL_API_KEY),
+                                                     audio_model_api_version = str(AZURE_OPENAI_AUDIOMODEL_API_VERSION),
+                                                     text_structuring_model_endpoint_uri = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT),
+                                                     text_structuring_model_api_key = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_KEY),
+                                                     text_structuring_model_api_version = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_VERSION),
+                                                     text_structuring_model_name = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME)
+                                                     )
     contextual_chunk_pl.run()
 
     # Initialize and run Lightrag ETL
