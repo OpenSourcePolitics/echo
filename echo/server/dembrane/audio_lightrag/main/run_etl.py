@@ -6,7 +6,7 @@ from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipelin
 from dembrane.audio_lightrag.pipelines.directus_etl_pipeline import DirectusETLPipeline
 from dembrane.audio_lightrag.pipelines.lightrag_etl_pipeline import LightragETLPipeline
 from dembrane.audio_lightrag.pipelines.contextual_chunk_etl_pipeline import (
-    ContaxtualChunkETLPipeline,
+    ContextualChunkETLPipeline,
 )
 
 load_dotenv()
@@ -31,7 +31,7 @@ def run_etl_pipeline(conv_id_list: list[str] = None) -> None:
     audio_pl.run()
 
     # Run Contextual Chunk ETL
-    contextual_chunk_pl = ContaxtualChunkETLPipeline(process_tracker)
+    contextual_chunk_pl = ContextualChunkETLPipeline(process_tracker)
     contextual_chunk_pl.run()
 
     # Initialize and run Lightrag ETL

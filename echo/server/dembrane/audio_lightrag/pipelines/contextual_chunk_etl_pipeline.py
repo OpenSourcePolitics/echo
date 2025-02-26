@@ -13,7 +13,7 @@ from dembrane.audio_lightrag.utils.open_ai_utils import get_json_dict_from_audio
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
 
-class ContaxtualChunkETLPipeline:
+class ContextualChunkETLPipeline:
     def __init__(self,
                  process_tracker:ProcessTracker,
                  audio_model_endpoint_uri:str,
@@ -23,7 +23,7 @@ class ContaxtualChunkETLPipeline:
                  text_structuring_model_api_key:str,
                  text_structuring_model_api_version:str,
                  text_structuring_model_name:str = 'text_structuring_model',
-                 config_path:str = 'server/dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml') -> None:
+                 config_path:str = 'server/dembrane/audio_lightrag/configs/contextual_chunk_etl_pipeline_config.yaml') -> None:
         self.audio_model_endpoint_uri = audio_model_endpoint_uri
         self.audio_model_api_key = audio_model_api_key
         self.audio_model_api_version = audio_model_api_version
@@ -34,9 +34,9 @@ class ContaxtualChunkETLPipeline:
         # Setup Azure clients
         self.audio_model_client = setup_azure_client(audio_model_endpoint_uri, 
                                                      audio_model_api_key, audio_model_api_version)
-        self.text_structuring_model_client = setup_azure_client(
-            text_structuring_model_endpoint_uri, text_structuring_model_api_key, 
-            text_structuring_model_api_version)
+        self.text_structuring_model_client = setup_azure_client(text_structuring_model_endpoint_uri, 
+                                                                text_structuring_model_api_key,
+                                                                text_structuring_model_api_version)
     
         self.config = self.load_config(config_path)
         self.output_json_filepath = self.config['output_json_filepath']
@@ -124,11 +124,11 @@ if __name__ == "__main__":
     # text_structuring_model_endpoint_uri = os.getenv("AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT")
     # text_structuring_model_api_key = os.getenv("AZURE_OPENAI_API_KEY")
     # text_structuring_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-    # pipeline = ContaxtualChunkETLPipeline(audio_model_endpoint_uri, audio_model_api_key, audio_model_api_version,
+    # pipeline = ContextualChunkETLPipeline(audio_model_endpoint_uri, audio_model_api_key, audio_model_api_version,
     #              text_structuring_model_endpoint_uri, text_structuring_model_api_key, text_structuring_model_api_version)
     process_tracker = ProcessTracker(pd.read_csv('server/dembrane/audio_lightrag/data/progress_tracker.csv'), 
                                      project_df = pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id'))
-    pipeline = ContaxtualChunkETLPipeline('/home/azureuser/cloudfiles/code/Users/arindamroy11235/experiments/server/dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml',
+    pipeline = ContextualChunkETLPipeline('/home/azureuser/cloudfiles/code/Users/arindamroy11235/experiments/server/dembrane/audio_lightrag/configs/contextual_chunk_etl_pipeline_config.yaml',
                                           process_tracker)
     pipeline.run()
     
