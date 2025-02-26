@@ -1,12 +1,13 @@
-import pytest
 import pandas as pd
+import pytest
+
 
 @pytest.fixture
-def conversation_df():
+def conversation_df() -> pd.DataFrame:
     df = pd.read_csv('server/dembrane/audio_lightrag/tests/data/test_conversation_df.csv')
     return df
 
 @pytest.fixture
-def project_df():
+def project_df() -> pd.DataFrame:
     df = pd.read_csv('server/dembrane/audio_lightrag/tests/data/test_project_df.csv')
     return df.set_index('id')

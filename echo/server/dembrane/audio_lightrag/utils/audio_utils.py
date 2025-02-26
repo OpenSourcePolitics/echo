@@ -1,15 +1,16 @@
-import base64
 import os
-import requests
+import base64
 import logging
+
+import requests
 from pydub import AudioSegment
 
-    
-def get_wav_file_size(path):
+
+def get_wav_file_size(path: str) -> float:
     size_mb = os.path.getsize(path) / (1024 * 1024)  # Convert bytes to MB
     return size_mb
 
-def convert_to_wav(input_filepath, output_filepath = None):
+def convert_to_wav(input_filepath: str, output_filepath: str | None = None) -> str | None:
     if output_filepath == None: output_filepath = '.'.join(input_filepath.split('.')[:-1])+'.wav'
     try:
         audio = AudioSegment.from_file(input_filepath)
@@ -20,10 +21,10 @@ def convert_to_wav(input_filepath, output_filepath = None):
         logging.error(f"Error converting file to WAV: {e}")
         return None
 
-def download_chunk_audio_file(conversation_id, chunk_id, file_extension,
-                              root_dir, url,
-                              access_token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMWJiMDhiLTE0ZWItNDkyZC1hN2ZkLTFlZWQ4OWVhNDUyYiIsInJvbGUiOiIyZWFiNjNlMC1mODczLTRjYTctYjMzYS1jYzIwNTcyNDQzYzEiLCJhcHBfYWNjZXNzIjp0cnVlLCJhZG1pbl9hY2Nlc3MiOnRydWUsInNlc3Npb24iOiJrQlNWSjZFZnVfVlpUNHRVaDc4VVlRWllHS2J3MkhQeHpKZ28xNFpLYktuVDV4NDJiT0pXM1VZX3FIOGxMcTg3IiwiaWF0IjoxNzQwNTA0MDcxLCJleHAiOjE3NDA1OTA0NzEsImlzcyI6ImRpcmVjdHVzIn0.if7mtZ4dk7ilC_mEyiKKY3lqAFlc6QrdNemYdG9UpAU',
-                              ):
+def download_chunk_audio_file(conversation_id: int, chunk_id: int, file_extension: str,
+                              root_dir: str, url: str,
+                              access_token: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMWJiMDhiLTE0ZWItNDkyZC1hN2ZkLTFlZWQ4OWVhNDUyYiIsInJvbGUiOiIyZWFiNjNlMC1mODczLTRjYTctYjMzYS1jYzIwNTcyNDQzYzEiLCJhcHBfYWNjZXNzIjp0cnVlLCJhZG1pbl9hY2Nlc3MiOnRydWUsInNlc3Npb24iOiJrQlNWSjZFZnVfVlpUNHRVaDc4VVlRWllHS2J3MkhQeHpKZ28xNFpLYktuVDV4NDJiT0pXM1VZX3FIOGxMcTg3IiwiaWF0IjoxNzQwNTA0MDcxLCJleHAiOjE3NDA1OTA0NzEsImlzcyI6ImRpcmVjdHVzIn0.if7mtZ4dk7ilC_mEyiKKY3lqAFlc6QrdNemYdG9UpAU',
+                              ) -> str | None:
     url = url.format(conversation_id = conversation_id,chunk_id = chunk_id)
     # Set headers
     headers = {"Accept": "*/*"}
@@ -48,7 +49,7 @@ def download_chunk_audio_file(conversation_id, chunk_id, file_extension,
         logging.error(f"Failed to download file. Status Code: {response.status_code}, Response: {response.text}")
         return None
 
-def split_wav_to_chunks(input_filepath, n_chunks, counter, output_filedir):
+def split_wav_to_chunks(input_filepath: str, n_chunks: int, counter: int, output_filedir: str) -> list[str]:
 
     chunk_name = input_filepath.split('/')[-1].split('.')[0].split('_')[0] + "_" + str(counter)
     # Load the audio file
@@ -69,7 +70,7 @@ def split_wav_to_chunks(input_filepath, n_chunks, counter, output_filedir):
 
     return output_files
 
-def process_wav_files(audio_filepath_list, output_filepath, max_size_mb, counter = 0):
+def process_wav_files(audio_filepath_list: list[str], output_filepath: str, max_size_mb: float, counter: int = 0) -> list[str]:
     """
     Ensures all files are segmented close to max_size_mb.
     **** File might be a little larger than max limit 

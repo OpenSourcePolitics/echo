@@ -1,7 +1,8 @@
 from openai import AzureOpenAI
-import os
-def setup_azure_client(endpoint_uri, api_key,
-                       api_version):
+
+
+def setup_azure_client(endpoint_uri: str, api_key: str,
+                       api_version: str) -> AzureOpenAI:
     """
     Setup Azure OpenAI client with the provided credentials
     

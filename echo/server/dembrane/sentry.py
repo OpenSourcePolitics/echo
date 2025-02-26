@@ -41,7 +41,7 @@ def init_sentry() -> None:
         # Conditionally add OpenAI integration
         try:
             integrations.append(
-                OpenAIIntegration(
+                StarletteIntegration(
                     include_prompts=False,  # LLM/tokenizer inputs/outputs will be not sent to Sentry, despite send_default_pii=True
                     tiktoken_encoding_name="cl100k_base",
                 )

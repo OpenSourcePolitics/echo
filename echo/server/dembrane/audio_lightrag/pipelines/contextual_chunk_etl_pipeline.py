@@ -64,8 +64,8 @@ class ContextualChunkETLPipeline:
         with open(config_path, "r") as file:
             return yaml.safe_load(file)
     
-    def extract(self):pass
-    def transform(self):
+    def extract(self) -> None:pass 
+    def transform(self) -> None:
         for conversation_id in self.valid_process_tracker_df[self.valid_process_tracker_df.json_status.isna()].conversation_id.unique():
             output_json_filepath = os.path.join(self.output_json_filepath, conversation_id+'.json')
             if os.path.isfile(output_json_filepath):
@@ -106,29 +106,29 @@ class ContextualChunkETLPipeline:
                 with open(output_json_filepath,'w') as f:
                     json.dump(responses,f)
 
-    def load(self):pass
+    def load(self) -> None:pass
 
-    def run(self):
+    def run(self) -> None:
         self.extract()
         self.transform()
         self.load()
             
 
-if __name__ == "__main__":
-    from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
-    import pandas as pd
-    # load_dotenv()
-    # audio_model_endpoint_uri = os.getenv("AZURE_OPENAI_AUDIOMODEL_ENDPOINT")
-    # audio_model_api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    # audio_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-    # text_structuring_model_endpoint_uri = os.getenv("AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT")
-    # text_structuring_model_api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    # text_structuring_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-    # pipeline = ContextualChunkETLPipeline(audio_model_endpoint_uri, audio_model_api_key, audio_model_api_version,
-    #              text_structuring_model_endpoint_uri, text_structuring_model_api_key, text_structuring_model_api_version)
-    process_tracker = ProcessTracker(pd.read_csv('server/dembrane/audio_lightrag/data/progress_tracker.csv'), 
-                                     project_df = pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id'))
-    pipeline = ContextualChunkETLPipeline('/home/azureuser/cloudfiles/code/Users/arindamroy11235/experiments/server/dembrane/audio_lightrag/configs/contextual_chunk_etl_pipeline_config.yaml',
-                                          process_tracker)
-    pipeline.run()
+# if __name__ == "__main__":
+#     from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
+#     import pandas as pd
+#     # load_dotenv()
+#     # audio_model_endpoint_uri = os.getenv("AZURE_OPENAI_AUDIOMODEL_ENDPOINT")
+#     # audio_model_api_key = os.getenv("AZURE_OPENAI_API_KEY")
+#     # audio_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
+#     # text_structuring_model_endpoint_uri = os.getenv("AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT")
+#     # text_structuring_model_api_key = os.getenv("AZURE_OPENAI_API_KEY")
+#     # text_structuring_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
+#     # pipeline = ContextualChunkETLPipeline(audio_model_endpoint_uri, audio_model_api_key, audio_model_api_version,
+#     #              text_structuring_model_endpoint_uri, text_structuring_model_api_key, text_structuring_model_api_version)
+#     process_tracker = ProcessTracker(pd.read_csv('server/dembrane/audio_lightrag/data/progress_tracker.csv'), 
+#                                      project_df = pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id'))
+#     pipeline = ContextualChunkETLPipeline('/home/azureuser/cloudfiles/code/Users/arindamroy11235/experiments/server/dembrane/audio_lightrag/configs/contextual_chunk_etl_pipeline_config.yaml',
+#                                           process_tracker)
+#     pipeline.run()
     

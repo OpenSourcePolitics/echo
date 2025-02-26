@@ -1,9 +1,11 @@
 import os
 import unittest
+
 from dembrane.audio_lightrag.pipelines.directus_etl_pipeline import DirectusETLPipeline
 
+
 class TestDirectusETLPipeline(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.directus_etl_pipeline = DirectusETLPipeline()
 
     def test_run(self) -> None:

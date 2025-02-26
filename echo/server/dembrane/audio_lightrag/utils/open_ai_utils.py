@@ -1,16 +1,22 @@
-from pydantic import BaseModel
-from dembrane.audio_lightrag.utils.audio_utils import wav_to_str
-from dembrane.audio_lightrag.utils.prompts import Prompts
 import json
+
+from openai import AzureOpenAI
+from pydantic import BaseModel
+
+from dembrane.audio_lightrag.utils.prompts import Prompts
+from dembrane.audio_lightrag.utils.audio_utils import wav_to_str
+
 
 class Transctiptions(BaseModel):
     TRANSCRIPT: list[str]
     CONTEXTUAL_TRANSCRIPT: str
-def get_json_dict_from_audio(wav_loc,
-                        audio_model_client, 
-                        audio_model_prompt, 
-                        text_structuring_model_client,
-                        text_structuring_model_name):
+
+def get_json_dict_from_audio(wav_loc: str,
+                        audio_model_client: AzureOpenAI, 
+                        audio_model_prompt: str, 
+                        text_structuring_model_client: AzureOpenAI,
+                        text_structuring_model_name: str,
+                        ) -> dict:
     audio_model_messages=[
             {
                 "role": "system",
