@@ -42,6 +42,7 @@ def test_audio_etl_pipeline_m4a(conversation_df: pd.DataFrame, project_df: pd.Da
     audio_etl_pipeline = AudioETLPipeline(process_tracker)
     audio_etl_pipeline.run()
     process_tracker.delete_temps()
+    assert (process_tracker()[process_tracker()].shape[0] != 0)
     assert (process_tracker()[process_tracker().segment==-1].shape[0] == 0)
     assert (process_tracker()[process_tracker().segment.isna()].shape[0] == 0)
 
@@ -53,6 +54,7 @@ def test_audio_etl_pipeline_mp3(conversation_df: pd.DataFrame, project_df: pd.Da
     audio_etl_pipeline = AudioETLPipeline(process_tracker)
     audio_etl_pipeline.run()
     process_tracker.delete_temps()
+    assert (process_tracker()[process_tracker()].shape[0] != 0)
     assert (process_tracker()[process_tracker().segment==-1].shape[0] == 0)
     assert (process_tracker()[process_tracker().segment.isna()].shape[0] == 0)
 
