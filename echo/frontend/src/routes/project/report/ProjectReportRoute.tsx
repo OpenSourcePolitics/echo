@@ -259,6 +259,7 @@ export const ProjectReportRoute = () => {
               }
             }}
             disabled={isUpdatingReport}
+            size={data.status === "published" ? "sm" : "md"}
           />
         </Group>
       }
