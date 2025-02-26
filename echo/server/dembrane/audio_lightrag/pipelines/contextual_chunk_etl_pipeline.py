@@ -1,28 +1,36 @@
-from pydoc import text
-from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
-from dembrane.audio_lightrag.utils.open_ai_utils import get_json_dict_from_audio
-from dembrane.audio_lightrag.utils.prompts import Prompts
 # from dotenv import load_dotenv
 import os
-import yaml
 import glob
 import json
+from pydoc import text
+
+import yaml
 import pandas as pd
+
+from dembrane.audio_lightrag.utils.prompts import Prompts
+from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
+from dembrane.audio_lightrag.utils.open_ai_utils import get_json_dict_from_audio
+from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
+
 
 class ContaxtualChunkETLPipeline:
     def __init__(self,
-                 process_tracker,
-                 config_path = 'server/dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml',
-                 ):
-        # Env loads
-        # load_dotenv()
-        audio_model_endpoint_uri = os.getenv("AZURE_OPENAI_AUDIOMODEL_ENDPOINT")
-        audio_model_api_key = os.getenv("AZURE_OPENAI_API_KEY")
-        audio_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-        text_structuring_model_endpoint_uri = os.getenv("AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT")
-        text_structuring_model_api_key = os.getenv("AZURE_OPENAI_API_KEY")
-        text_structuring_model_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-        self.text_structuring_model_name = os.getenv("AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME")
+                 process_tracker:ProcessTracker,
+                 audio_model_endpoint_uri:str,
+                 audio_model_api_key:str,
+                 audio_model_api_version:str,
+                 text_structuring_model_endpoint_uri:str,
+                 text_structuring_model_api_key:str,
+                 text_structuring_model_api_version:str,
+                 text_structuring_model_name:str = 'text_structuring_model',
+                 config_path:str = 'server/dembrane/audio_lightrag/configs/contaxtual_chunk_etl_pipeline_config.yaml') -> None:
+        self.audio_model_endpoint_uri = audio_model_endpoint_uri
+        self.audio_model_api_key = audio_model_api_key
+        self.audio_model_api_version = audio_model_api_version
+        self.text_structuring_model_endpoint_uri = text_structuring_model_endpoint_uri
+        self.text_structuring_model_api_key = text_structuring_model_api_key
+        self.text_structuring_model_api_version = text_structuring_model_api_version
+        self.text_structuring_model_name = text_structuring_model_name
         # Setup Azure clients
         self.audio_model_client = setup_azure_client(audio_model_endpoint_uri, 
                                                      audio_model_api_key, audio_model_api_version)

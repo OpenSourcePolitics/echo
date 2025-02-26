@@ -22,13 +22,13 @@ def convert_to_wav(input_filepath, output_filepath = None):
 
 def download_chunk_audio_file(conversation_id, chunk_id, file_extension,
                               root_dir, url,
-                              access_token=None,
+                              access_token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMWJiMDhiLTE0ZWItNDkyZC1hN2ZkLTFlZWQ4OWVhNDUyYiIsInJvbGUiOiIyZWFiNjNlMC1mODczLTRjYTctYjMzYS1jYzIwNTcyNDQzYzEiLCJhcHBfYWNjZXNzIjp0cnVlLCJhZG1pbl9hY2Nlc3MiOnRydWUsInNlc3Npb24iOiJrQlNWSjZFZnVfVlpUNHRVaDc4VVlRWllHS2J3MkhQeHpKZ28xNFpLYktuVDV4NDJiT0pXM1VZX3FIOGxMcTg3IiwiaWF0IjoxNzQwNTA0MDcxLCJleHAiOjE3NDA1OTA0NzEsImlzcyI6ImRpcmVjdHVzIn0.if7mtZ4dk7ilC_mEyiKKY3lqAFlc6QrdNemYdG9UpAU',
                               ):
     url = url.format(conversation_id = conversation_id,chunk_id = chunk_id)
     # Set headers
     headers = {"Accept": "*/*"}
     if access_token:
-        headers["Authorization"] = f"Bearer {access_token}"
+        headers["Cookie"] = f"directus_session_token={access_token}"
     # Send GET request
     response = requests.get(url, headers=headers)
     # Check response status
