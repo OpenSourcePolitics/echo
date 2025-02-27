@@ -97,7 +97,9 @@ async def insert_item(request: Request, payload: InsertRequest) -> InsertRespons
     if rag is None:
         raise HTTPException(status_code=500, detail="RAG object not initialized")
     try:
-        result = rag.insert(payload.content)
+        # Insert the content and create a default result dictionary
+        rag.insert(payload.content)
+        result = {"status": "inserted", "content": payload.content}
         return InsertResponse(status="success", result=result)
     except Exception as e:
         logger.exception("Insert operation failed")

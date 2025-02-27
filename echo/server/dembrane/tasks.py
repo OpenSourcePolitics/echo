@@ -728,6 +728,7 @@ def task_create_project_library(_self, project_id: str, language: str):
 @celery_app.task(bind=True, retry_backoff=True, ignore_result=False, base=BaseTask)
 def task_finish_conversation_hook(self, conversation_id: str):
     try:
+        print('********** Running ETL pipeline **********')
         conversation_data = directus.get_items(
             "conversation",
             {

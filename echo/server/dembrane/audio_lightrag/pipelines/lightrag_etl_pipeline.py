@@ -22,7 +22,8 @@ class LightragETLPipeline:
     def __init__(self, 
                  process_tracker: ProcessTracker, 
                  config_path: str = "server/dembrane/audio_lightrag/configs/lightrag_etl_pipeline_config.yaml",
-                 api_base_url: str = "http://localhost:8000" ) -> None:
+                 api_base_url: str = "http://localhost:8000/api/stateless/rag" ) -> None:
+        print('********** Running ETL pipeline **********')
         self.config = self.load_config(config_path)
         self.process_tracker = process_tracker
         self.api_base_url = api_base_url
