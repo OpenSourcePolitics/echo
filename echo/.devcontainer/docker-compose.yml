@@ -12,7 +12,9 @@ services:
     image: pgvector/pgvector:0.6.2-pg16
     restart: unless-stopped
     ports:
-      - 5432:5432
+      - 5432:5432      
+      - 7474:7474  # Neo4j Browser
+      - 7687:7687  # Neo4j Bolt protocol
     environment:
       POSTGRES_DB: dembrane
       POSTGRES_USER: dembrane
@@ -30,7 +32,7 @@ services:
       - ./rabbitmq_data:/var/lib/rabbitmq
 
   neo4j:
-    image: neo4j:latest
+    image: neo4j:latest    
     volumes:
       - ./neo4j_data/logs:/logs
       - ./neo4j_data/config:/config
