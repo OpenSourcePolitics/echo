@@ -9,6 +9,7 @@ class TestDirectusETLPipeline(unittest.TestCase):
         self.directus_etl_pipeline = DirectusETLPipeline()
 
     def test_run(self) -> None:
+        print("**********Running test_run**********")
         self.directus_etl_pipeline.run()
         self.assertTrue(os.path.exists("server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv"))
         self.assertTrue(os.path.exists("server/dembrane/audio_lightrag/data/directus_etl_data/project.csv"))

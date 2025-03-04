@@ -65,12 +65,12 @@ class ProcessTracker:
         # Save the DataFrame
         self.save_df()
         
-    def update_json_status(self, conversation_id: int, segment: int, status: str) -> None:
+    def update_json_status(self, conversation_id: int, segment: float, status: str) -> None:
         self.df.loc[(self.df.conversation_id == conversation_id) & (self.df.segment == segment), 'json_status'] = status
         self.save_df()
 
-    def update_ligtrag_status(self, conversation_id: int, status: str) -> None:
-        self.df.loc[(self.df.conversation_id == conversation_id) , 'ligtrag_status'] = status
+    def update_ligtrag_status(self, conversation_id: int, segment: float, status: str) -> None:
+        self.df.loc[(self.df.conversation_id == conversation_id) & (self.df.segment == segment), 'ligtrag_status'] = status
         self.save_df()
 
     def save_df(self) -> None:

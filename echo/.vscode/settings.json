@@ -53,9 +53,9 @@
   ],
   "files.eol": "\n",
   "debug.internalConsoleOptions": "neverOpen",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": [
     "server"
-  ],
-  "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
+  ]
 }

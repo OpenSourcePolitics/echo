@@ -182,3 +182,7 @@ logger.debug("AZURE_EMBEDDING_DEPLOYMENT: set")
 AZURE_EMBEDDING_API_KEY = os.environ.get("AZURE_EMBEDDING_API_KEY")
 assert AZURE_EMBEDDING_API_KEY, "AZURE_EMBEDDING_API_KEY environment variable is not set"
 logger.debug("AZURE_EMBEDDING_API_KEY: set")
+
+DIRECTUS_SESSION_TOKEN = os.environ.get("DIRECTUS_SESSION_TOKEN")
+assert DIRECTUS_SESSION_TOKEN, "DIRECTUS_SESSION_TOKEN environment variable is not set"
+logger.debug("DIRECTUS_SESSION_TOKEN: set")

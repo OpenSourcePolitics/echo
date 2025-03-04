@@ -22,8 +22,8 @@ class TranscriptResponse(BaseModel):
 
 
 class InsertRequest(BaseModel):
-    content: str
-
+    content: str | list[str]
+    id: str | list[str] | None = None
 
 class InsertResponse(BaseModel):
     status: str
@@ -98,7 +98,7 @@ async def insert_item(request: Request, payload: InsertRequest) -> InsertRespons
         raise HTTPException(status_code=500, detail="RAG object not initialized")
     try:
         # Insert the content and create a default result dictionary
-        rag.insert(payload.content)
+        rag.insert(payload.content, payload.id)
         result = {"status": "inserted", "content": payload.content}
         return InsertResponse(status="success", result=result)
     except Exception as e:

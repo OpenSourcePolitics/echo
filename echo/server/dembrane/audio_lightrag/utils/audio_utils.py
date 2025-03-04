@@ -5,7 +5,7 @@ import logging
 import requests
 from pydub import AudioSegment
 
-from dembrane.config import DIRECTUS_TOKEN
+from dembrane.config import DIRECTUS_SESSION_TOKEN
 
 
 def get_wav_file_size(path: str) -> float:
@@ -25,7 +25,7 @@ def convert_to_wav(input_filepath: str, output_filepath: str | None = None) -> s
 
 def download_chunk_audio_file(conversation_id: int, chunk_id: int, file_extension: str,
                               root_dir: str, url: str,
-                              directus_session_token: str = str(DIRECTUS_TOKEN),
+                              directus_session_token: str = str(DIRECTUS_SESSION_TOKEN),
                               ) -> str | None:
     url = url.format(conversation_id = conversation_id,chunk_id = chunk_id)
     # Set headers

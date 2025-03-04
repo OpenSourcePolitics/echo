@@ -6,7 +6,9 @@ from pydoc import text
 
 import yaml
 import pandas as pd
+import requests
 
+from dembrane.config import API_BASE_URL
 from dembrane.audio_lightrag.utils.prompts import Prompts
 from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
 from dembrane.audio_lightrag.utils.open_ai_utils import get_json_dict_from_audio
@@ -51,6 +53,7 @@ class ContextualChunkETLPipeline:
         self.process_tracker = process_tracker
         self.process_tracker_df = process_tracker()
         self.valid_process_tracker_df = self.process_tracker_df[self.process_tracker_df.segment.dropna()>=0]
+        self.api_base_url = API_BASE_URL
 
     def load_config(self, config_path: str) -> dict:
         """Load the configuration file.
@@ -98,6 +101,22 @@ class ContextualChunkETLPipeline:
                         self.process_tracker.update_json_status(conversation_id, 
                                                         row.segment_index,
                                                         'pass')
+                        
+                        # Insert the transcript into LightRAG
+                        response = requests.post(
+                            f"{self.api_base_url}/api/stateless/rag/insert",
+                            json={"content": responses[row.conversationid_segmentfloat]['CONTEXTUAL_TRANSCRIPT'],
+                                  "id": row.conversationid_segmentfloat}
+                        )
+
+                        if response.status_code == 200:
+                            self.process_tracker.update_ligtrag_status(conversation_id, 
+                                            row.segment_index,
+                                            'pass')
+                        else:
+                            self.process_tracker.update_ligtrag_status(conversation_id, 
+                                            row.segment_index,
+                                            'fail')
                         
                     except Exception as e:
                         self.process_tracker.update_json_status(conversation_id, 
