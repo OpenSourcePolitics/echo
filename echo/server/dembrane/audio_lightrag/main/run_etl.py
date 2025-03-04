@@ -13,15 +13,15 @@ from dembrane.config import (
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipeline
 from dembrane.audio_lightrag.pipelines.directus_etl_pipeline import DirectusETLPipeline
-from dembrane.audio_lightrag.pipelines.lightrag_etl_pipeline import LightragETLPipeline
+
+# from dembrane.audio_lightrag.pipelines.lightrag_etl_pipeline import LightragETLPipeline
 from dembrane.audio_lightrag.pipelines.contextual_chunk_etl_pipeline import (
     ContextualChunkETLPipeline,
 )
 
 load_dotenv()
 
-def run_etl_pipeline(conv_id_list: list[str],
-                     api_base_url: str = "http://localhost:8000/api/stateless/rag") -> None:
+def run_etl_pipeline(conv_id_list: list[str]) -> None:
     """
     Runs the complete ETL pipeline including Directus, Audio, Contextual Chunk, and Lightrag processes.
     """
@@ -53,9 +53,9 @@ def run_etl_pipeline(conv_id_list: list[str],
     contextual_chunk_pl.run()
 
     # Initialize and run Lightrag ETL
-    lightrag_pl = LightragETLPipeline(process_tracker,
-                                      api_base_url=api_base_url)
-    lightrag_pl.run()
+    # lightrag_pl = LightragETLPipeline(process_tracker,
+    #                                   api_base_url=api_base_url)
+    # lightrag_pl.run()
 
     process_tracker.delete_temps()
 
