@@ -5,6 +5,8 @@ import logging
 import requests
 from pydub import AudioSegment
 
+from dembrane.config import DIRECTUS_TOKEN
+
 
 def get_wav_file_size(path: str) -> float:
     size_mb = os.path.getsize(path) / (1024 * 1024)  # Convert bytes to MB
@@ -23,13 +25,13 @@ def convert_to_wav(input_filepath: str, output_filepath: str | None = None) -> s
 
 def download_chunk_audio_file(conversation_id: int, chunk_id: int, file_extension: str,
                               root_dir: str, url: str,
-                              access_token: str = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwMWJiMDhiLTE0ZWItNDkyZC1hN2ZkLTFlZWQ4OWVhNDUyYiIsInJvbGUiOiIyZWFiNjNlMC1mODczLTRjYTctYjMzYS1jYzIwNTcyNDQzYzEiLCJhcHBfYWNjZXNzIjp0cnVlLCJhZG1pbl9hY2Nlc3MiOnRydWUsInNlc3Npb24iOiJzM1p1UFprZnIzRmFiNW5JemhKNEVPb1VIRkZTQWZDcGw3NGlnemtMTmJreDVLU2tjRm1xdlpZXy1ybllhT2NpIiwiaWF0IjoxNzQwNjQzMTY0LCJleHAiOjE3NDA3Mjk1NjQsImlzcyI6ImRpcmVjdHVzIn0.LeJxy0VYy-EWsI19YxoviUZ-rG0PdC-GYJmRogV9CN0',
+                              directus_session_token: str = str(DIRECTUS_TOKEN),
                               ) -> str | None:
     url = url.format(conversation_id = conversation_id,chunk_id = chunk_id)
     # Set headers
     headers = {"Accept": "*/*"}
-    if access_token:
-        headers["Cookie"] = f"directus_session_token={access_token}"
+    if directus_session_token:
+        headers["Cookie"] = f"directus_session_token={directus_session_token}"
     # Send GET request
     response = requests.get(url, headers=headers)
     # Check response status
