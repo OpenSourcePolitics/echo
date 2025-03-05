@@ -19,4 +19,4 @@ def project_df() -> pd.DataFrame:
 @pytest.fixture
 def test_audio_uuid() -> str:
     """Fixture providing a test UUID for audio files."""
-    return 'e76ec7e1-8374-48a1-896b-7ea2d9863af9'
+    return '1f08cda8-2288-4fe3-b602-ea84e0d31688'

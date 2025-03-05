@@ -12,6 +12,18 @@
       },
       "console": "integratedTerminal",
       "justMyCode": "false"
+    },
+    {
+      "name": "Python: Contextual Chunk ETL Pipeline Debug",
+      "type": "python",
+      "request": "launch",
+      "program": "dembrane/audio_lightrag/tests/unit_tests/contextual_chunk_etl_pipeline_test.py",
+      "cwd": "${workspaceFolder}/server",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/server"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": "false"
     }
   ]
 }
