@@ -4,11 +4,16 @@ import glob
 import json
 from pydoc import text
 
-import yaml
+# import yaml
 import pandas as pd
 import requests
 
-from dembrane.config import API_BASE_URL
+from dembrane.config import (
+    API_BASE_URL,
+    AUDIO_LIGHTRAG_SEGMENT_DIR,
+    AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH,
+    AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM,
+)
 from dembrane.audio_lightrag.utils.prompts import Prompts
 from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
 from dembrane.audio_lightrag.utils.open_ai_utils import get_json_dict_from_audio
@@ -24,8 +29,7 @@ class ContextualChunkETLPipeline:
                  text_structuring_model_endpoint_uri:str,
                  text_structuring_model_api_key:str,
                  text_structuring_model_api_version:str,
-                 text_structuring_model_name:str = 'text_structuring_model',
-                 config_path:str = 'server/dembrane/audio_lightrag/configs/contextual_chunk_etl_pipeline_config.yaml') -> None:
+                 text_structuring_model_name:str = 'text_structuring_model',) -> None:
         self.audio_model_endpoint_uri = audio_model_endpoint_uri
         self.audio_model_api_key = audio_model_api_key
         self.audio_model_api_version = audio_model_api_version
@@ -40,10 +44,10 @@ class ContextualChunkETLPipeline:
                                                                 text_structuring_model_api_key,
                                                                 text_structuring_model_api_version)
     
-        self.config = self.load_config(config_path)
-        self.output_json_filepath = self.config['output_json_filepath']
-        self.audio_filepath_li = glob.glob(self.config['segment_root_dir']+'/*')
-        self.conversation_history_num = self.config['conversation_history_num']
+        # self.config = self.load_config(config_path)
+        self.output_json_filepath = AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH
+        self.audio_filepath_li = glob.glob(AUDIO_LIGHTRAG_SEGMENT_DIR+'/*')
+        self.conversation_history_num = AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM
         # Create a temporary dataframe to maintain order of file: Big files in have '*_1-1.*' type of names 
         self.temp_segments_df = pd.DataFrame({'audio_filepath':self.audio_filepath_li})
         self.temp_segments_df['segment_index'] = self.temp_segments_df.audio_filepath.apply(lambda audio_filepath: float(audio_filepath.split('_')[-1].split('.')[0].replace('-','.')))
@@ -55,17 +59,17 @@ class ContextualChunkETLPipeline:
         self.valid_process_tracker_df = self.process_tracker_df[self.process_tracker_df.segment.dropna()>=0]
         self.api_base_url = API_BASE_URL
 
-    def load_config(self, config_path: str) -> dict:
-        """Load the configuration file.
+    # def load_config(self, config_path: str) -> dict:
+    #     """Load the configuration file.
 
-        Args:
-        - config_path (str): Path to the configuration file.
+    #     Args:
+    #     - config_path (str): Path to the configuration file.
 
-        Returns:
-        - dict: Loaded configuration as a dictionary.
-        """
-        with open(config_path, "r") as file:
-            return yaml.safe_load(file)
+    #     Returns:
+    #     - dict: Loaded configuration as a dictionary.
+    #     """
+    #     with open(config_path, "r") as file:
+    #         return yaml.safe_load(file)
     
     def extract(self) -> None:pass 
     def transform(self) -> None:

@@ -36,7 +36,13 @@ def download_chunk_audio_file_as_wav(
     try:
         chunk_response = directus.get_items(
             "conversation_chunk",
-            query={"filter": {"conversation_id": conversation_id, "id": chunk_id}},
+            {
+                "query": {
+                "filter": {
+                    "id": {"_eq": chunk_id}
+                }
+                }
+            },
         )
 
         if len(chunk_response) == 0:

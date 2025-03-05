@@ -28,7 +28,7 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
     
     # Run Directus ETL
     directus_pl = DirectusETLPipeline()
-    directus_pl.run( conv_id_list )
+    directus_pl.run(conv_id_list)
 
     # Initialize process tracker
     process_tracker = ProcessTracker(
@@ -51,12 +51,6 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
                                                      text_structuring_model_name = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME)
                                                      )
     contextual_chunk_pl.run()
-
-    # Initialize and run Lightrag ETL
-    # lightrag_pl = LightragETLPipeline(process_tracker,
-    #                                   api_base_url=api_base_url)
-    # lightrag_pl.run()
-
     process_tracker.delete_temps()
 
 if __name__ == "__main__":

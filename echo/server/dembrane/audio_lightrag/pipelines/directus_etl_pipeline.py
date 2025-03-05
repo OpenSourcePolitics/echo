@@ -1,41 +1,53 @@
-import os
 from typing import Any, Dict, List, Tuple, Optional
 
-import yaml
+# import yaml
 import pandas as pd
 from dotenv import load_dotenv
 from directus_sdk_py import DirectusClient
 
-from dembrane.config import DIRECTUS_TOKEN, DIRECTUS_BASE_URL
+from dembrane.config import (
+    DIRECTUS_TOKEN,
+    DIRECTUS_BASE_URL,
+    AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH,
+    AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH,
+)
 
 
 class DirectusETLPipeline:
     """
     A class for extracting, transforming, and loading data from Directus.
     """
-    def __init__(self, 
-                 config_path: str = "server/dembrane/audio_lightrag/configs/directus_etl_pipeline_config.yaml") -> None:
+    def __init__(self) -> None:
         # Load environment variables from the .env file
         load_dotenv()
 
-        # Load configuration from the config.yaml file
-        self.config = self.load_config(config_path)
-
         # Get accepted formats from config
-        self.accepted_formats = self.config["accepted_formats"]
-        self.project_request = self.config["project_request"]
-        self.conversation_request = self.config["conversation_request"]
+        self.accepted_formats = ['wav', 'mp3', 'm4a']
 
-
+        self.project_request = {"query": {"fields": 
+                                                ["id", "name", "language", "context", 
+                                                "default_conversation_title", 
+                                                "default_conversation_description"], 
+                                           "limit": 100000}}
+        self.conversation_request = {"query": 
+                                     {"fields": ["id", "project_id", 
+                                                 "chunks.id", "chunks.path", 
+                                                 "chunks.timestamp"], 
+                                           "limit": 100000,
+                                           "deep": {"chunks": 
+                                                    {"_limit": 100000, "_sort": "timestamp"}
+                                                    }
+                                                }
+                                    }
 
         # Initialize the Directus client using sensitive info from environment variables
         self.directus_client = DirectusClient(DIRECTUS_BASE_URL, DIRECTUS_TOKEN)
         
 
-    def load_config(self, config_path: str) -> Dict[str, Any]:
-        """Load the configuration file."""
-        with open(config_path, "r") as file:
-            return yaml.safe_load(file)
+    # def load_config(self, config_path: str) -> Dict[str, Any]:
+    #     """Load the configuration file."""
+    #     with open(config_path, "r") as file:
+    #         return yaml.safe_load(file)
 
     def extract(self, conversation_id_list: Optional[List[str]] = None) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -97,8 +109,8 @@ class DirectusETLPipeline:
         """
         Load the transformed data to CSV files.
         """
-        conversation_output_path = self.config.get("conversation_output_path", "conversation.csv")
-        project_output_path = self.config.get("project_output_path", "project.csv")
+        conversation_output_path = AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH
+        project_output_path = AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH
 
         # if os.path.isfile(conversation_output_path):
         #     pd.concat([pd.read_csv(conversation_output_path).rename(columns = {"id": "conversation_id"}), conversation_df], ignore_index=True)

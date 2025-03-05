@@ -183,6 +183,37 @@ AZURE_EMBEDDING_API_KEY = os.environ.get("AZURE_EMBEDDING_API_KEY")
 assert AZURE_EMBEDDING_API_KEY, "AZURE_EMBEDDING_API_KEY environment variable is not set"
 logger.debug("AZURE_EMBEDDING_API_KEY: set")
 
-DIRECTUS_SESSION_TOKEN = os.environ.get("DIRECTUS_SESSION_TOKEN")
-assert DIRECTUS_SESSION_TOKEN, "DIRECTUS_SESSION_TOKEN environment variable is not set"
-logger.debug("DIRECTUS_SESSION_TOKEN: set")
+# DIRECTUS_SESSION_TOKEN = os.environ.get("DIRECTUS_SESSION_TOKEN")
+# assert DIRECTUS_SESSION_TOKEN, "DIRECTUS_SESSION_TOKEN environment variable is not set"
+# logger.debug("DIRECTUS_SESSION_TOKEN: set")
+
+AUDIO_LIGHTRAG_DOWNLOAD_DIR = os.environ.get("AUDIO_LIGHTRAG_DOWNLOAD_DIR", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/Temp_Downloads"))
+assert AUDIO_LIGHTRAG_DOWNLOAD_DIR, "AUDIO_LIGHTRAG_DOWNLOAD_DIR environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_DOWNLOAD_DIR: set")
+
+AUDIO_LIGHTRAG_SEGMENT_DIR = os.environ.get("AUDIO_LIGHTRAG_SEGMENT_DIR", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/Temp_Segments"))
+assert AUDIO_LIGHTRAG_SEGMENT_DIR, "AUDIO_LIGHTRAG_SEGMENT_DIR environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_SEGMENT_DIR: set")
+
+AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB = os.environ.get("AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB", 15)
+assert AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB, "AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB: set")
+
+AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH = os.environ.get("AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/JSON_Output"))
+assert AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH, "AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH: set")
+
+#conversation_history_num
+AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM = os.environ.get("AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM", 10)
+assert AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM, "AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM: set")
+
+# conversation_output_path: "server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv"
+# project_output_path: "server/dembrane/audio_lightrag/data/directus_etl_data/project.csv"
+AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/directus_etl_data/conversation.csv"))
+assert AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH, "AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH: set")
+
+AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/directus_etl_data/project.csv"))
+assert AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH, "AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH: set")

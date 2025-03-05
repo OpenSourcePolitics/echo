@@ -1,7 +1,11 @@
 import os
 
-import yaml
-
+# import yaml
+from dembrane.config import (
+    AUDIO_LIGHTRAG_SEGMENT_DIR,
+    AUDIO_LIGHTRAG_DOWNLOAD_DIR,
+    AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB,
+)
 from dembrane.audio_lightrag.utils.audio_utils import (
     process_wav_files,
     download_chunk_audio_file_as_wav,
@@ -13,7 +17,8 @@ class AudioETLPipeline:
     def __init__(
         self,
         process_tracker: ProcessTracker,
-        config_path: str = "server/dembrane/audio_lightrag/configs/audio_etl_pipeline_config.yaml",
+        # config_path: str = "server/dembrane/audio_lightrag/configs/audio_etl_pipeline_config.yaml",
+        # config_path: str = os.path.join(BASE_DIR, "dembrane/audio_lightrag/configs/audio_etl_pipeline_config.yaml"),
     ) -> None:
         """
         Initialize the AudioETLPipeline.
@@ -27,23 +32,10 @@ class AudioETLPipeline:
         """
         self.process_tracker = process_tracker
         self.process_tracker_df = process_tracker()
-        self.config = self.load_config(config_path)
-        self.download_root_dir = self.config["download_root_dir"]
-        self.segment_root_dir = self.config["segment_root_dir"]
-        self.audio_url = self.config["audio_url"]
-        self.max_size_mb = self.config["max_audio_file_size_mb"]
-
-    def load_config(self, config_path: str) -> dict:
-        """Load the configuration file.
-
-        Args:
-        - config_path (str): Path to the configuration file.
-
-        Returns:
-        - dict: Loaded configuration as a dictionary.
-        """
-        with open(config_path, "r") as file:
-            return yaml.safe_load(file)
+        # self.config = self.load_config(config_path)
+        self.download_root_dir = AUDIO_LIGHTRAG_DOWNLOAD_DIR
+        self.segment_root_dir = AUDIO_LIGHTRAG_SEGMENT_DIR
+        self.max_size_mb = AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB
 
     def extract(self) -> None:
         # Get unique project and conversation IDs
@@ -116,7 +108,7 @@ class AudioETLPipeline:
                 unprocessed_chunk_file_path_li = process_wav_files(
                     unprocessed_chunk_file_path_li,
                     output_filepath,
-                    max_size_mb=self.max_size_mb,
+                    max_size_mb=float(self.max_size_mb),
                     counter=counter,
                 )
                 processed_chunk_file_path_li = [

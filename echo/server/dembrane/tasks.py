@@ -1,5 +1,6 @@
 # mypy: disable-error-code="no-untyped-def"
 from typing import List
+
 from celery import Celery, chain, chord, group, signals  # type: ignore
 from sentry_sdk import capture_exception
 from celery.utils.log import get_task_logger  # type: ignore
@@ -756,15 +757,15 @@ def task_finish_conversation_hook(self, conversation_id: str):
         for chunk in conversation_data["chunks"]:
             transcript_str += chunk["transcript"]
 
-        # summary = generate_summary(transcript_str, None, language if language else "nl")
+        summary = generate_summary(transcript_str, None, language if language else "nl")
         
-        # directus.update_item(
-        #     collection_name="conversation",
-        #     item_id=conversation_id,
-        #     item_data={
-        #         "summary": summary,
-        #     },
-        # )
+        directus.update_item(
+            collection_name="conversation",
+            item_id=conversation_id,
+            item_data={
+                "summary": summary,
+            },
+        )
         run_etl_pipeline_audio_lightrag([conversation_id])
 
     except Exception as e:
