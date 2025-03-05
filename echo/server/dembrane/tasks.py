@@ -770,7 +770,7 @@ def task_finish_conversation_hook(self, conversation_id: str):
             )
         except Exception as e:
             logger.error(f"Error: {e}")
-            raise self.retry(exc=e) from e
+            pass
         run_etl_pipeline_audio_lightrag([conversation_id])
 
     except Exception as e:
