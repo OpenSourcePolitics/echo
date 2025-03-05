@@ -41,5 +41,5 @@ def test_Contextual_chunk_etl_pipeline(conversation_df: pd.DataFrame, project_df
     with open(AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH + '/' + test_conversation_id + '.json') as f: 
         responses = json.load(f)
     assert (len(responses) == len(process_tracker().segment.unique()))
-    assert set(responses[test_conversation_id + '_0.0'].keys()) == set(['TRANSCRIPT','CONTEXTUAL_TRANSCRIPT'])
+    assert set(responses[test_conversation_id + '_0.0000'].keys()) == set(['TRANSCRIPT','CONTEXTUAL_TRANSCRIPT'])
     process_tracker.delete_temps()
