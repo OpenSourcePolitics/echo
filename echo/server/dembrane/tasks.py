@@ -750,21 +750,27 @@ def task_finish_conversation_hook(self, conversation_id: str):
         conversation_data = conversation_data[0]
 
         language = conversation_data["project_id"]["language"]
-
-        # transcript_str = ""
-
-        # for chunk in conversation_data["chunks"]:
-        #     transcript_str += chunk["transcript"]
-
-        # summary = generate_summary(transcript_str, None, language if language else "nl")
         
-        # directus.update_item(
-        #     collection_name="conversation",
-        #     item_id=conversation_id,
-        #     item_data={
-        #         "summary": summary,
-        #     },
-        # )
+        
+        # TODO: Please check this try/except code logging and logic @sameer/@Usama
+        try: 
+            transcript_str = ""
+
+            for chunk in conversation_data["chunks"]:
+                transcript_str += chunk["transcript"]
+
+            summary = generate_summary(transcript_str, None, language if language else "nl")
+            
+            directus.update_item(
+                collection_name="conversation",
+                item_id=conversation_id,
+                item_data={
+                    "summary": summary,
+                },
+            )
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            raise self.retry(exc=e) from e
         run_etl_pipeline_audio_lightrag([conversation_id])
 
     except Exception as e:
