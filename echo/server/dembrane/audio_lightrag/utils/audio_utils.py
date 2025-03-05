@@ -5,15 +5,19 @@ import logging
 import requests
 from pydub import AudioSegment
 
-from dembrane.config import DIRECTUS_SESSION_TOKEN
+from dembrane.directus import directus
 
 
 def get_wav_file_size(path: str) -> float:
     size_mb = os.path.getsize(path) / (1024 * 1024)  # Convert bytes to MB
     return size_mb
 
+
 def convert_to_wav(input_filepath: str, output_filepath: str | None = None) -> str | None:
-    if output_filepath == None: output_filepath = '.'.join(input_filepath.split('.')[:-1])+'.wav'
+    # TODO: Check if the file is already a WAV file
+
+    if output_filepath == None:
+        output_filepath = ".".join(input_filepath.split(".")[:-1]) + ".wav"
     try:
         audio = AudioSegment.from_file(input_filepath)
         audio.export(output_filepath, format="wav")
@@ -23,46 +27,57 @@ def convert_to_wav(input_filepath: str, output_filepath: str | None = None) -> s
         logging.error(f"Error converting file to WAV: {e}")
         return None
 
-def download_chunk_audio_file(conversation_id: int, chunk_id: int, file_extension: str,
-                              root_dir: str, url: str,
-                              directus_session_token: str = str(DIRECTUS_SESSION_TOKEN),
-                              ) -> str | None:
-    url = url.format(conversation_id = conversation_id,chunk_id = chunk_id)
-    # Set headers
-    headers = {"Accept": "*/*"}
-    if directus_session_token:
-        headers["Cookie"] = f"directus_session_token={directus_session_token}"
-    # Send GET request
-    response = requests.get(url, headers=headers)
-    # Check response status
-    if response.status_code == 200:
-        # Ensure root directory exists
-        os.makedirs(root_dir, exist_ok=True)
-        # Generate filename with root directory
-        filename = os.path.join(root_dir, f"{conversation_id}_{chunk_id}.{file_extension}")
-        # Save file
-        with open(filename, "wb") as file:
-            file.write(response.content)
-        if file_extension != 'wav':
-            return convert_to_wav(filename)
+
+def download_chunk_audio_file_as_wav(
+    conversation_id: int,
+    chunk_id: int,
+    temp_dir: str,
+) -> str | None:
+    try:
+        chunk_response = directus.get_items(
+            "conversation_chunk",
+            query={"filter": {"conversation_id": conversation_id, "id": chunk_id}},
+        )
+
+        if len(chunk_response) == 0:
+            logging.error(
+                f"Chunk not found for conversation_id: {conversation_id}, chunk_id: {chunk_id}"
+            )
+            return None
+
+        chunk_data = chunk_response[0]
+        original_audio_path = chunk_data["path"]
+
+        file_extension = original_audio_path.split(".")[-1]
+        temp_audio_path = os.path.join(temp_dir, f"{conversation_id}_{chunk_id}.{file_extension}")
+
+        with open(original_audio_path, "rb") as src_file:
+            with open(temp_audio_path, "wb") as dst_file:
+                dst_file.write(src_file.read())
+
+        if file_extension.lower() != "wav":
+            return convert_to_wav(temp_audio_path)
         else:
-            return filename
-    else:
-        logging.error(f"Failed to download file. Status Code: {response.status_code}, Response: {response.text}")
+            return temp_audio_path
+
+    except Exception as e:
+        logging.error(f"Failed to process audio file: {e}")
         return None
 
-def split_wav_to_chunks(input_filepath: str, n_chunks: int, counter: int, output_filedir: str) -> list[str]:
 
-    chunk_name = input_filepath.split('/')[-1].split('.')[0].split('_')[0] + "_" + str(counter)
+def split_wav_to_chunks(
+    input_filepath: str, n_chunks: int, counter: int, output_filedir: str
+) -> list[str]:
+    chunk_name = input_filepath.split("/")[-1].split(".")[0].split("_")[0] + "_" + str(counter)
     # Load the audio file
     audio = AudioSegment.from_wav(input_filepath)
-    
+
     # Calculate chunk length
     chunk_length = len(audio) // n_chunks  # Duration in milliseconds
     output_files = []
     for i in range(n_chunks):
-        chunk_output_filename = chunk_name + '-' + str(i) +'.wav'
-        chunk_output_filepath = os.path.join(output_filedir,chunk_output_filename)
+        chunk_output_filename = chunk_name + "-" + str(i) + ".wav"
+        chunk_output_filepath = os.path.join(output_filedir, chunk_output_filename)
         start_time = i * chunk_length
         end_time = (i + 1) * chunk_length if i != n_chunks - 1 else len(audio)
         chunk = audio[start_time:end_time]
@@ -72,15 +87,18 @@ def split_wav_to_chunks(input_filepath: str, n_chunks: int, counter: int, output
 
     return output_files
 
-def process_wav_files(audio_filepath_list: list[str], output_filepath: str, max_size_mb: float, counter: int = 0) -> list[str]:
+
+def process_wav_files(
+    audio_filepath_list: list[str], output_filepath: str, max_size_mb: float, counter: int = 0
+) -> list[str]:
     """
     Ensures all files are segmented close to max_size_mb.
-    **** File might be a little larger than max limit 
+    **** File might be a little larger than max limit
     """
     output_filedir = os.path.dirname(output_filepath)
     combined = AudioSegment.empty()
     combined.export(output_filepath, format="wav")
-    while len(audio_filepath_list)!=0:
+    while len(audio_filepath_list) != 0:
         file = audio_filepath_list[0]
         try:
             audio = AudioSegment.from_wav(file)
@@ -89,12 +107,10 @@ def process_wav_files(audio_filepath_list: list[str], output_filepath: str, max_
             break
         input_file_size = get_wav_file_size(file)
         # If the file is larger -> break to n_sub_chunks
-        if input_file_size>max_size_mb:
+        if input_file_size > max_size_mb:
             combined += audio
-            n_sub_chunks = int((input_file_size//max_size_mb)+1)
-            split_wav_to_chunks(file, n_sub_chunks,
-                                counter = counter,
-                                output_filedir = output_filedir)
+            n_sub_chunks = int((input_file_size // max_size_mb) + 1)
+            split_wav_to_chunks(file, n_sub_chunks, counter=counter, output_filedir=output_filedir)
             audio_filepath_list = audio_filepath_list[1:]
             os.remove(output_filepath)
             break
@@ -103,8 +119,10 @@ def process_wav_files(audio_filepath_list: list[str], output_filepath: str, max_
             if get_wav_file_size(output_filepath) <= max_size_mb:
                 combined.export(output_filepath, format="wav")
                 audio_filepath_list = audio_filepath_list[1:]
-            else: break
+            else:
+                break
     return audio_filepath_list
+
 
 def wav_to_str(wav_file_path: str) -> str:
     with open(wav_file_path, "rb") as file:
