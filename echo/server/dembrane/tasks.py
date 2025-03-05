@@ -729,7 +729,6 @@ def task_create_project_library(_self, project_id: str, language: str):
 @celery_app.task(bind=True, retry_backoff=True, ignore_result=False, base=BaseTask)
 def task_finish_conversation_hook(self, conversation_id: str):
     try:
-        print('********** Running ETL pipeline **********')
         conversation_data = directus.get_items(
             "conversation",
             {
@@ -752,20 +751,20 @@ def task_finish_conversation_hook(self, conversation_id: str):
 
         language = conversation_data["project_id"]["language"]
 
-        transcript_str = ""
+        # transcript_str = ""
 
-        for chunk in conversation_data["chunks"]:
-            transcript_str += chunk["transcript"]
+        # for chunk in conversation_data["chunks"]:
+        #     transcript_str += chunk["transcript"]
 
-        summary = generate_summary(transcript_str, None, language if language else "nl")
+        # summary = generate_summary(transcript_str, None, language if language else "nl")
         
-        directus.update_item(
-            collection_name="conversation",
-            item_id=conversation_id,
-            item_data={
-                "summary": summary,
-            },
-        )
+        # directus.update_item(
+        #     collection_name="conversation",
+        #     item_id=conversation_id,
+        #     item_data={
+        #         "summary": summary,
+        #     },
+        # )
         run_etl_pipeline_audio_lightrag([conversation_id])
 
     except Exception as e:

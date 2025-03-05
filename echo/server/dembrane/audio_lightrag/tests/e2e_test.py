@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import pytest
 
+from dembrane.config import AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH
 from dembrane.audio_lightrag.main.run_etl import run_etl_pipeline
 
 
@@ -11,7 +12,7 @@ def test_run_etl_pipeline(conversation_df: pd.DataFrame,
                           project_df: pd.DataFrame,
                           test_audio_uuid: str) -> None:
     # remove the json 
-    json_path = "server/dembrane/audio_lightrag/data/JSON_Output/1f08cda8-2288-4fe3-b602-ea84e0d31688.json"
+    json_path = AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH + '/' + test_audio_uuid + '.json'
     if os.path.exists(json_path):
         os.remove(json_path)
     run_etl_pipeline([

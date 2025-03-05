@@ -3,12 +3,18 @@ import shutil
 
 import pandas as pd
 
+from dembrane.config import (
+    AUDIO_LIGHTRAG_SEGMENT_DIR,
+    AUDIO_LIGHTRAG_DOWNLOAD_DIR,
+    AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH,
+)
+
 
 class ProcessTracker:
     def __init__(self, 
                  conversation_df: pd.DataFrame, 
                  project_df: pd.DataFrame,
-                 conversation_df_path: str = 'server/dembrane/audio_lightrag/data/progress_tracker.csv', 
+                 conversation_df_path: str = AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH, 
                  ) -> None:
         """
         Initialize the ProcessTracker.
@@ -32,6 +38,8 @@ class ProcessTracker:
         if 'ligtrag_status' not in conversation_df.columns:
             self.df['ligtrag_status'] = None
         self.project_df = project_df
+        self.temp_dir_lis = [str(AUDIO_LIGHTRAG_DOWNLOAD_DIR), 
+                             str(AUDIO_LIGHTRAG_SEGMENT_DIR)]
 
 
     def __call__(self) -> pd.DataFrame:
@@ -82,10 +90,8 @@ class ProcessTracker:
     def get_project_df(self) -> pd.DataFrame: 
         return self.project_df
     
-    def delete_temps(self,
-                     temp_dir_lis: list[str] = ['server/dembrane/audio_lightrag/data/Temp_Downloads','server/dembrane/audio_lightrag/data/Temp_Segments']
-                     ) -> None:
-        for temp_dir in temp_dir_lis:
+    def delete_temps(self) -> None:
+        for temp_dir in self.temp_dir_lis:
             shutil.rmtree(temp_dir)
             os.makedirs(temp_dir)
 

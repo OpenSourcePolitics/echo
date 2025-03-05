@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 from dembrane.config import (
     AZURE_OPENAI_AUDIOMODEL_API_KEY,
     AZURE_OPENAI_AUDIOMODEL_ENDPOINT,
+    AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH,
     AZURE_OPENAI_AUDIOMODEL_API_VERSION,
     AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME,
+    AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH,
     AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_KEY,
     AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT,
     AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_VERSION,
@@ -32,8 +34,8 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
 
     # Initialize process tracker
     process_tracker = ProcessTracker(
-        conversation_df=pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv'),
-        project_df=pd.read_csv('server/dembrane/audio_lightrag/data/directus_etl_data/project.csv').set_index('id')
+        conversation_df=pd.read_csv(AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH),
+        project_df=pd.read_csv(AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH).set_index('id')
     )
 
     # Run Audio ETL

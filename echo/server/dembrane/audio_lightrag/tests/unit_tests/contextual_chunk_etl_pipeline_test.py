@@ -6,6 +6,7 @@ import pytest
 from dembrane.config import (
     AZURE_OPENAI_AUDIOMODEL_API_KEY,
     AZURE_OPENAI_AUDIOMODEL_ENDPOINT,
+    AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH,
     AZURE_OPENAI_AUDIOMODEL_API_VERSION,
     AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME,
     AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_KEY,
@@ -37,7 +38,7 @@ def test_Contextual_chunk_etl_pipeline(conversation_df: pd.DataFrame, project_df
                                                             text_structuring_model_name = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME))
     contextual_chunk_pipeline.run()
    
-    with open('server/dembrane/audio_lightrag/data/JSON_Output/' + test_conversation_id + '.json') as f:
+    with open(AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH + '/' + test_conversation_id + '.json') as f: 
         responses = json.load(f)
     assert (len(responses) == len(process_tracker().segment.unique()))
     assert set(responses[test_conversation_id + '_0.0'].keys()) == set(['TRANSCRIPT','CONTEXTUAL_TRANSCRIPT'])
