@@ -78,16 +78,21 @@ DIRECTUS_TOKEN = os.environ.get("DIRECTUS_TOKEN")
 assert DIRECTUS_TOKEN, "DIRECTUS_TOKEN environment variable is not set"
 logger.debug("DIRECTUS_TOKEN: set")
 
-DIRECTUS_SESSION_COOKIE_NAME = os.environ.get("DIRECTUS_SESSION_COOKIE_NAME", "directus_session_token")
+DIRECTUS_SESSION_COOKIE_NAME = os.environ.get(
+    "DIRECTUS_SESSION_COOKIE_NAME", "directus_session_token"
+)
 logger.debug(f"DIRECTUS_SESSION_COOKIE_NAME: {DIRECTUS_SESSION_COOKIE_NAME}")
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 assert DATABASE_URL, "DATABASE_URL environment variable is not set"
 logger.debug("DATABASE_URL: set")
 
-RABBITMQ_URL = os.environ.get("RABBITMQ_URL")
-assert RABBITMQ_URL, "RABBITMQ_URL environment variable is not set"
-logger.debug("RABBITMQ_URL: set")
+if not DATABASE_URL.startswith("postgresql+psycopg://"):
+    logger.warning("DATABASE_URL is not a postgresql+psycopg:// URL, attempting to fix it...")
+    if DATABASE_URL.startswith("postgresql://"):
+        DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://")
+    else:
+        raise ValueError("DATABASE_URL is not valid (we need a postgresql+psycopg URL)")
 
 REDIS_URL = os.environ.get("REDIS_URL")
 assert REDIS_URL, "REDIS_URL environment variable is not set"
@@ -120,7 +125,6 @@ logger.debug(f"BUILD_VERSION: {BUILD_VERSION}")
 ENVIRONMENT = "development"
 if BUILD_VERSION != "dev":
     ENVIRONMENT = "production"
-
 logger.debug(f"ENVIRONMENT: {ENVIRONMENT}")
 
 # Neo4j configuration
@@ -217,3 +221,36 @@ logger.debug("AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH: set")
 AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/directus_etl_data/project.csv"))
 assert AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH, "AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH: set")
+STORAGE_S3_BUCKET = os.environ.get("STORAGE_S3_BUCKET")
+assert STORAGE_S3_BUCKET, "STORAGE_S3_BUCKET environment variable is not set"
+logger.debug("STORAGE_S3_BUCKET: set")
+
+STORAGE_S3_REGION = os.environ.get("STORAGE_S3_REGION")
+assert STORAGE_S3_REGION, "STORAGE_S3_REGION environment variable is not set"
+logger.debug("STORAGE_S3_REGION: set")
+
+STORAGE_S3_ENDPOINT = os.environ.get("STORAGE_S3_ENDPOINT")
+assert STORAGE_S3_ENDPOINT, "STORAGE_S3_ENDPOINT environment variable is not set"
+logger.debug("STORAGE_S3_ENDPOINT: set")
+
+STORAGE_S3_KEY = os.environ.get("STORAGE_S3_KEY")
+assert STORAGE_S3_KEY, "STORAGE_S3_KEY environment variable is not set"
+logger.debug("STORAGE_S3_KEY: set")
+
+STORAGE_S3_SECRET = os.environ.get("STORAGE_S3_SECRET")
+assert STORAGE_S3_SECRET, "STORAGE_S3_SECRET environment variable is not set"
+logger.debug("STORAGE_S3_SECRET: set")
+
+for hide_logger in [
+    "boto3",
+    "botocore",
+    "httpx",
+    "httpcore",
+    "LiteLLM",
+    "openai",
+    "requests",
+    "psycopg",
+    "s3transfer",
+    "urllib3",
+]:
+    logging.getLogger(hide_logger).setLevel(logging.WARNING)

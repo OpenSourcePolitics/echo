@@ -7,7 +7,7 @@ from celery.utils.log import get_task_logger  # type: ignore
 
 import dembrane.tasks_config
 from dembrane.utils import generate_uuid, get_utc_timestamp
-from dembrane.config import REDIS_URL, RABBITMQ_URL
+from dembrane.config import REDIS_URL
 from dembrane.sentry import init_sentry
 from dembrane.database import (
     ViewModel,
@@ -38,10 +38,9 @@ from dembrane.audio_lightrag.main.run_etl import run_etl_pipeline as run_etl_pip
 
 logger = get_task_logger("celery_tasks")
 
-assert RABBITMQ_URL, "RABBITMQ_URL environment variable is not set"
 assert REDIS_URL, "REDIS_URL environment variable is not set"
 
-celery_app = Celery("tasks", broker=RABBITMQ_URL, result_backend=REDIS_URL + "/0")
+celery_app = Celery("tasks", broker=REDIS_URL + "/0", result_backend=REDIS_URL + "/0")
 
 celery_app.config_from_object(dembrane.tasks_config)
 
@@ -77,32 +76,6 @@ class BaseTask(celery_app.Task):  # type: ignore
 def log_error(_self, exc: Exception):
     logger.error(f"Error: {exc}")
     raise exc
-
-
-# def update_progress(
-#     self_object: Any,
-#     current: int,
-#     total: int,
-#     message: Optional[str] = None,
-# ):
-#     """
-#     Update the progress of a task.
-
-#     Args:
-#         self_object: The task object
-#         currentStep: The current step
-#         totalStep: The total number of steps
-#         message: Optional message to display
-#     """
-#     self_object.update_state(
-#         state="PROGRESS",
-#         meta={
-#             "current": current,
-#             "total": total,
-#             "percent": floor((current / total) * 100),
-#             "message": message,
-#         },
-#     )
 
 
 @celery_app.task(
@@ -156,8 +129,7 @@ def task_split_audio_chunk(self, chunk_id: str) -> List[str]:
     """
     with DatabaseSession() as db:
         try:
-            chunks = split_audio_chunk(db, chunk_id)
-            return [chunk.id for chunk in chunks]
+            return split_audio_chunk(chunk_id)
         except Exception as exc:
             logger.error(f"Error: {exc}")
             db.rollback()

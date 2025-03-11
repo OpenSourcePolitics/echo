@@ -6,7 +6,6 @@ caddy_config
 postgres_data
 
 pgadmin_data
-rabbitmq_data
 appsmith_data
 redis_data
 directus/uploads

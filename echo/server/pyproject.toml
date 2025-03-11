@@ -70,7 +70,8 @@ dependencies = [
     # LLM Tools
     "tiktoken",
     "asyncpg",
-    "neo4j"
+    "neo4j",
+    "boto3>=1.37.9",
     # "trankit @ git+https://github.com/nlp-uoregon/trankit",
 ]
 
