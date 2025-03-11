@@ -13,7 +13,6 @@ class TestDirectusETLPipeline(unittest.TestCase):
         self.directus_etl_pipeline = DirectusETLPipeline()
 
     def test_run(self) -> None:
-        print("**********Running test_run**********")
         self.directus_etl_pipeline.run()
         self.assertTrue(os.path.exists(AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH))
         self.assertTrue(os.path.exists(AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH))
