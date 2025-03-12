@@ -8,7 +8,7 @@ from dembrane.audio_lightrag.utils.audio_utils import wav_to_str
 
 
 class Transctiptions(BaseModel):
-    TRANSCRIPT: list[str]
+    TRANSCRIPTS: list[str]
     CONTEXTUAL_TRANSCRIPT: str
 
 def get_json_dict_from_audio(wav_loc: str,

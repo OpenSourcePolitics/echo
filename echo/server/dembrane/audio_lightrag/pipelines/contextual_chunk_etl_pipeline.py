@@ -3,6 +3,7 @@ import os
 import glob
 import json
 from pydoc import text
+from logging import getLogger
 
 # import yaml
 import pandas as pd
@@ -19,6 +20,7 @@ from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
 from dembrane.audio_lightrag.utils.open_ai_utils import get_json_dict_from_audio
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
+logger = getLogger("audio_lightrag.pipelines.contextual_chunk_etl_pipeline")
 
 class ContextualChunkETLPipeline:
     def __init__(self,
@@ -58,19 +60,6 @@ class ContextualChunkETLPipeline:
         self.process_tracker_df = process_tracker()
         self.valid_process_tracker_df = self.process_tracker_df[self.process_tracker_df.segment.dropna()>=0]
         self.api_base_url = API_BASE_URL
-
-    # def load_config(self, config_path: str) -> dict:
-    #     """Load the configuration file.
-
-    #     Args:
-    #     - config_path (str): Path to the configuration file.
-
-    #     Returns:
-    #     - dict: Loaded configuration as a dictionary.
-    #     """
-    #     with open(config_path, "r") as file:
-    #         return yaml.safe_load(file)
-    
     def extract(self) -> None:pass 
     def transform(self) -> None:
         for conversation_id in self.valid_process_tracker_df[self.valid_process_tracker_df.json_status.isna()].conversation_id.unique():
@@ -90,7 +79,7 @@ class ContextualChunkETLPipeline:
             for _,row in conversation_segments_df.iterrows():
                 previous_respenses_text = '\n\n'.join([previous_conversation['CONTEXTUAL_TRANSCRIPT']
                                                 for previous_conversation in 
-                                                list(responses.values())[-self.conversation_history_num:]])
+                                                list(responses.values())[-int(self.conversation_history_num):]])
                 audio_model_prompt = Prompts.audio_model_system_prompt()
                 audio_model_prompt = audio_model_prompt.format(event_text = event_text, 
                                         previous_conversation_text = previous_respenses_text)
@@ -110,7 +99,8 @@ class ContextualChunkETLPipeline:
                         response = requests.post(
                             f"{self.api_base_url}/api/stateless/rag/insert",
                             json={"content": responses[row.conversationid_segmentfloat]['CONTEXTUAL_TRANSCRIPT'],
-                                  "id": row.conversationid_segmentfloat}
+                                  "id": row.conversationid_segmentfloat,
+                                  "transcripts": [responses[row.conversationid_segmentfloat]['TRANSCRIPTS']]}
                         )
 
                         if response.status_code == 200:
@@ -118,11 +108,13 @@ class ContextualChunkETLPipeline:
                                             row.segment_index,
                                             'pass')
                         else:
+                            logger.info("Error in inserting transcript into LightRAG. Check API health")
                             self.process_tracker.update_ligtrag_status(conversation_id, 
                                             row.segment_index,
                                             'fail')
                         
                     except Exception as e:
+                        logger.exception(f"Error in inserting transcript into LightRAG : {e}")
                         self.process_tracker.update_json_status(conversation_id, 
                                             row.segment_index,
                                             'fail')

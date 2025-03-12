@@ -4,6 +4,7 @@ from typing import Any, AsyncGenerator
 from logging import getLogger
 from contextlib import asynccontextmanager
 
+import nest_asyncio
 from fastapi import (
     FastAPI,
     Request,
@@ -25,8 +26,8 @@ from dembrane.config import (
 )
 from dembrane.sentry import init_sentry
 from dembrane.api.api import api
-from dembrane.audio_lightrag.utils.lightrag_utils import embedding_func
-import nest_asyncio
+from dembrane.audio_lightrag.utils.lightrag_utils import embedding_func, check_audio_lightrag_tables
+
 nest_asyncio.apply()
 
 logger = getLogger("server")
@@ -51,6 +52,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     postgres_db = PostgreSQLDB(config=postgres_config)
     await postgres_db.initdb()
     await postgres_db.check_tables()
+    await check_audio_lightrag_tables(postgres_db)
 
     working_dir = os.environ["POSTGRES_WORK_DIR"]
     if not os.path.exists(working_dir):
