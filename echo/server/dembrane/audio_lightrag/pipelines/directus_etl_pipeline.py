@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List, Tuple, Optional
 
 # import yaml
@@ -12,6 +13,7 @@ from dembrane.config import (
     AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH,
 )
 
+logger = logging.getLogger("dembrane.audio_lightrag.pipelines.directus_etl_pipeline")
 
 class DirectusETLPipeline:
     """
@@ -22,7 +24,7 @@ class DirectusETLPipeline:
         load_dotenv()
 
         # Get accepted formats from config
-        self.accepted_formats = ['wav', 'mp3', 'm4a']
+        self.accepted_formats = ['wav', 'mp3', 'm4a', 'ogg']
 
         self.project_request = {"query": {"fields": 
                                                 ["id", "name", "language", "context", 
@@ -103,34 +105,42 @@ class DirectusETLPipeline:
         project_df = pd.DataFrame(project)
         project_df.set_index('id', inplace=True)
 
+        if conversation_df.empty:
+            logger.warning("No conversation data found")
+        if project_df.empty:
+            logger.warning("No project data found")
+
         return conversation_df, project_df
 
-    def load_df_to_directory(self, conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
+    def load_df_to_directory(self, 
+                             conversation_df: pd.DataFrame, 
+                             project_df: pd.DataFrame,
+                             conversation_output_path: str,
+                             project_output_path: str) -> None:
         """
         Load the transformed data to CSV files.
         """
-        conversation_output_path = AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH
-        project_output_path = AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH
-
-        # if os.path.isfile(conversation_output_path):
-        #     pd.concat([pd.read_csv(conversation_output_path).rename(columns = {"id": "conversation_id"}), conversation_df], ignore_index=True)
-        # else:
-        #     conversation_df.to_csv(conversation_output_path)
-        
-        # if os.path.isfile(project_output_path):
-        #     pd.read_csv(project_output_path).append(project_df).to_csv(project_output_path) 
-        # else: project_df.to_csv(project_output_path)
         conversation_df.rename(columns = {"id": "conversation_id"}).to_csv(conversation_output_path, index=False)
         project_df.to_csv(project_output_path, index=True)
 
         print(f"Conversation data saved to {conversation_output_path}")
         print(f"Project data saved to {project_output_path}")
 
-    def run(self, conversation_id_list: Optional[List[str]] = None) -> None:
+    def run(self, 
+            conversation_id_list: Optional[List[str]] = None,
+            conversation_output_path: str | None = None,
+            project_output_path: str | None = None) -> None:
         """Run the full ETL pipeline: extract, transform, and load."""
+        if conversation_output_path is None:
+            conversation_output_path = AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH
+        if project_output_path is None:
+            project_output_path = AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH
         conversation, project = self.extract(conversation_id_list=conversation_id_list)
         conversation_df, project_df = self.transform(conversation, project)
-        self.load_df_to_directory(conversation_df, project_df)
+        self.load_df_to_directory(conversation_df, 
+                                  project_df, 
+                                  conversation_output_path, 
+                                  project_output_path)
 
 
 if __name__ == "__main__":
