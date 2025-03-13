@@ -4,6 +4,13 @@ from logging import getLogger
 from fastapi import Request, APIRouter, HTTPException
 from litellm import completion
 from pydantic import BaseModel
+from lightrag.lightrag import QueryParam
+from lightrag.kg.postgres_impl import PostgreSQLDB
+
+from dembrane.audio_lightrag.utils.lightrag_utils import (
+    upsert_transcript,
+    fetch_query_transcript,
+)
 
 logger = getLogger("api.stateless")
 
