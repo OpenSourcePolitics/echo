@@ -204,7 +204,7 @@ Error creating a new project OR "Create+" button not working OR you get the foll
     ```
 1. **Add the following environment variables to the env file inside "echo > echo > server" directory**.
     ```bash
-    STORAGE_S3_REGION=<your-region>
+    STORAGE_S3_REGION=<region>
     STORAGE_S3_ENDPOINT=<storage-endpoint>
     STORAGE_S3_BUCKET=<name>
     STORAGE_S3_KEY=<key>
