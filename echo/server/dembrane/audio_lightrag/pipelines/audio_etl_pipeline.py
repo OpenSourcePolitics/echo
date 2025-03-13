@@ -1,4 +1,5 @@
 import os
+import logging
 
 # import yaml
 from dembrane.config import (
@@ -7,6 +8,7 @@ from dembrane.config import (
     AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB,
 )
 from dembrane.audio_lightrag.utils.audio_utils import (
+    process_ogg_files,
     process_wav_files,
     download_chunk_audio_file_as_wav,
 )
@@ -37,60 +39,56 @@ class AudioETLPipeline:
         self.segment_root_dir = AUDIO_LIGHTRAG_SEGMENT_DIR
         self.max_size_mb = AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB
 
-    def extract(self) -> None:
-        # Get unique project and conversation IDs
-        zip_unique = list(
-            set(zip(self.process_tracker_df.project_id, self.process_tracker_df.conversation_id))
-        )
+    def extract(self) -> None: pass
+        # # Get unique project and conversation IDs
+        # zip_unique = list(
+        #     set(zip(self.process_tracker_df.project_id, self.process_tracker_df.conversation_id))
+        # )
 
-        for project_id, conversation_id in zip_unique:
-            # Get unique chunk IDs for each project and conversation
-            chunk_li = self.process_tracker_df.loc[
-                (self.process_tracker_df.project_id == project_id)
-                & (self.process_tracker_df.conversation_id == conversation_id)
-            ].chunk_id.unique()
+        # for project_id, conversation_id in zip_unique:
+        #     # Get unique chunk IDs for each project and conversation
+        #     chunk_li = self.process_tracker_df.loc[
+        #         (self.process_tracker_df.project_id == project_id)
+        #         & (self.process_tracker_df.conversation_id == conversation_id)
+        #     ].chunk_id.unique()
 
-            for chunk_id in chunk_li:
-                file_extension = self.process_tracker()[
-                    self.process_tracker().chunk_id == chunk_id
-                ].format.unique()[0]
 
-                # Download audio file for each chunk as a WAV file
-                download_file_path = download_chunk_audio_file_as_wav(
-                    conversation_id, chunk_id, temp_dir=self.download_root_dir
-                )
 
-                if file_extension == "mp4":
-                    pass  # TODO: implement mp4 to wav
+        #     for chunk_id in chunk_li:
+        #         file_extension = self.process_tracker()[
+        #             self.process_tracker().chunk_id == chunk_id
+        #         ].format.unique()[0]
 
-                # Update process tracker with download status
-                if download_file_path is not None:
-                    self.process_tracker.update_download_status(conversation_id, chunk_id, "pass")
-                else:
-                    self.process_tracker.update_download_status(conversation_id, chunk_id, "fail")
+        #         # Download audio file for each chunk as a WAV file
+        #         download_file_path = 
+
+        #         if file_extension == "mp4":
+        #             pass  # TODO: implement mp4 to wav
+
+        #         # Update process tracker with download status
+        #         if download_file_path is not None:
+        #             self.process_tracker.update_download_status(conversation_id, chunk_id, "pass")
+        #         else:
+        #             self.process_tracker.update_download_status(conversation_id, chunk_id, "fail")
 
     def transform(self) -> None:
-        downloaded_process_tracker_df = self.process_tracker_df[
-            (self.process_tracker_df.download_status == "pass")
-            & (self.process_tracker_df.segment.isna() == True)
+        transform_process_tracker_df = self.process_tracker_df[
+            (self.process_tracker_df.segment.isna() == True)
         ]
         zip_unique = list(
             set(
                 zip(
-                    downloaded_process_tracker_df.project_id,
-                    downloaded_process_tracker_df.conversation_id,
+                    transform_process_tracker_df.project_id,
+                    transform_process_tracker_df.conversation_id,
+                    strict=True
                 )
             )
         )
         for project_id, conversation_id in zip_unique:
-            chunk_li = downloaded_process_tracker_df.loc[
-                (downloaded_process_tracker_df.project_id == project_id)
-                & (downloaded_process_tracker_df.conversation_id == conversation_id)
-            ].chunk_id.unique()
-            unprocessed_chunk_file_path_li = [
-                os.path.join(self.download_root_dir, conversation_id + "_" + chunk_id + ".wav")
-                for chunk_id in chunk_li
-            ]
+            unprocessed_chunk_file_path_li = transform_process_tracker_df.loc[
+                (transform_process_tracker_df.project_id == project_id)
+                & (transform_process_tracker_df.conversation_id == conversation_id)
+            ].path.to_list()
             counter = (
                 max(
                     -1,
@@ -103,33 +101,32 @@ class AudioETLPipeline:
             while len(unprocessed_chunk_file_path_li) != 0:
                 state_chunk_file_path_li = unprocessed_chunk_file_path_li
                 output_filepath = os.path.join(
-                    self.segment_root_dir, conversation_id + "_" + str(counter) + ".wav"
+                    self.segment_root_dir, conversation_id + "_" + str(counter) + ".ogg"
                 )
-                unprocessed_chunk_file_path_li = process_wav_files(
+                unprocessed_chunk_file_path_li = process_ogg_files(
                     unprocessed_chunk_file_path_li,
                     output_filepath,
                     max_size_mb=float(self.max_size_mb),
                     counter=counter,
+                    conversation_id=conversation_id,
                 )
                 processed_chunk_file_path_li = [
                     x for x in state_chunk_file_path_li if x not in unprocessed_chunk_file_path_li
                 ]
+                # No processed chunk file case
                 if len(processed_chunk_file_path_li) == 0:
                     error_file = unprocessed_chunk_file_path_li[0]
-                    segment_dict = {error_file.split("_")[-1].split(".")[0]: -1}
+                    segment_dict = {error_file.split("/")[-1][37:73]: -1}
                     unprocessed_chunk_file_path_li = unprocessed_chunk_file_path_li[1:]
+                    self.process_tracker.update_segment(segment_dict)
+                    logging.error(f"Error processing ogg file: {error_file}")
                 else:
                     segment_dict = {
-                        file_path.split("_")[-1].split(".")[0]: counter
+                        file_path.split('/')[-1][37:73]: counter
                         for file_path in processed_chunk_file_path_li
                     }  # chunk to counter
                     self.process_tracker.update_segment(segment_dict)
                     counter = counter + 1
-            # Remove downloaded files after processing
-            for chunk_id in chunk_li:
-                os.remove(
-                    os.path.join(self.download_root_dir, conversation_id + "_" + chunk_id + ".wav")
-                )
 
     def load(self) -> None:
         pass

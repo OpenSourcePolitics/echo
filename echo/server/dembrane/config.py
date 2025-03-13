@@ -221,6 +221,11 @@ logger.debug("AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH: set")
 AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/directus_etl_data/project.csv"))
 assert AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH, "AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH: set")
+
+AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/process_tracker.csv"))
+assert AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH, "AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH: set")
+
 STORAGE_S3_BUCKET = os.environ.get("STORAGE_S3_BUCKET")
 assert STORAGE_S3_BUCKET, "STORAGE_S3_BUCKET environment variable is not set"
 logger.debug("STORAGE_S3_BUCKET: set")

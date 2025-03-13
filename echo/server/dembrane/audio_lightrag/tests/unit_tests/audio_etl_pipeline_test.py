@@ -59,6 +59,19 @@ def test_audio_etl_pipeline_mp3(conversation_df: pd.DataFrame,
     assert (process_tracker()[process_tracker().segment==-1].shape[0] == 0)
     assert (process_tracker()[process_tracker().segment.isna()].shape[0] == 0)
 
+@pytest.mark.usefixtures("conversation_df", "project_df")
+def test_audio_etl_pipeline_ogg(conversation_df: pd.DataFrame, 
+                                project_df: pd.DataFrame) -> None:
+    process_tracker = ProcessTracker(conversation_df=
+                                     conversation_df[conversation_df.format=='ogg'],
+                                            project_df=project_df)   
+    audio_etl_pipeline = AudioETLPipeline(process_tracker)
+    audio_etl_pipeline.run()
+    process_tracker.delete_temps()
+    assert (process_tracker().shape[0] != 0)
+    assert (process_tracker()[process_tracker().segment==-1].shape[0] == 0)
+    assert (process_tracker()[process_tracker().segment.isna()].shape[0] == 0)
+
 # @pytest.mark.usefixtures("conversation_df", "project_df")
 # def test_audio_etl_pipeline_wav(conversation_df: pd.DataFrame, project_df: pd.DataFrame):
 #     process_tracker = ProcessTracker(conversation_df=

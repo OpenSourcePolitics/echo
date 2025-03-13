@@ -109,3 +109,13 @@ def get_stream_from_s3(file_name: str) -> StreamingBody:
 def delete_from_s3(file_name: str) -> None:
     file_name = get_sanitized_s3_key(file_name)
     s3_client.delete_object(Bucket=STORAGE_S3_BUCKET, Key=file_name)
+
+
+def get_file_size_from_s3_mb(file_name: str) -> float:
+    file_name = get_sanitized_s3_key(file_name)
+    
+    # Use head_object to get metadata about the object
+    response = s3_client.head_object(Bucket=STORAGE_S3_BUCKET, Key=file_name)
+    
+    # Return the size of the object in bytes
+    return response['ContentLength']/(1024*1024)

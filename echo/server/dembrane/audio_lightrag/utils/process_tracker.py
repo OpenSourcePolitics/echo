@@ -6,7 +6,7 @@ import pandas as pd
 from dembrane.config import (
     AUDIO_LIGHTRAG_SEGMENT_DIR,
     AUDIO_LIGHTRAG_DOWNLOAD_DIR,
-    AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH,
+    AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH,
 )
 
 
@@ -14,7 +14,7 @@ class ProcessTracker:
     def __init__(self, 
                  conversation_df: pd.DataFrame, 
                  project_df: pd.DataFrame,
-                 conversation_df_path: str = AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH, 
+                 process_tracker_df_path: str = AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH,
                  ) -> None:
         """
         Initialize the ProcessTracker.
@@ -23,8 +23,8 @@ class ProcessTracker:
         - df (pd.DataFrame): DataFrame containing the information to be tracked.
         - df_path (str): Path to save the DataFrame.
         """
+        self.process_tracker_df_path = process_tracker_df_path
         self.df = conversation_df
-        self.df_path = conversation_df_path
         self.project_df = project_df
         # Ensure the columns are present
         if 'download_status' not in conversation_df.columns:
@@ -85,7 +85,7 @@ class ProcessTracker:
         """
         Save the DataFrame to the given path.
         """
-        self.df.to_csv(self.df_path, index=False)
+        self.df.to_csv(self.process_tracker_df_path, index=False)
     
     def get_project_df(self) -> pd.DataFrame: 
         return self.project_df
