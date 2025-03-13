@@ -193,6 +193,26 @@ If the Directus container does not start:
    ```
    - This syncs your Directus configuration.
 
+### 8.3 Error creating a new project
+
+Error creating a new project OR "Create+" button not working OR you get the following error:
+    ```bash
+    Proxying request to /api/projects
+    8:30:49 AM [vite] http proxy error: /api/projects
+    Error: connect ECONNREFUSED 127.0.0.1:8000
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1634:16)
+    ```
+1. **Add the following environment variables to the env file inside "echo > echo > server" directory**.
+    ```bash
+    STORAGE_S3_REGION=<your-region>
+    STORAGE_S3_ENDPOINT=<storage-endpoint>
+    STORAGE_S3_BUCKET=<name>
+    STORAGE_S3_KEY=<key>
+    STORAGE_S3_SECRET=<secret>
+    ```
+    ![image](https://github.com/user-attachments/assets/7599d0c7-2a7a-429e-8a90-ed5559b0e8b2)
+
+
 ---
 
 ## 9. Final Setup Steps
