@@ -152,13 +152,13 @@ def split_ogg_to_chunks(
     chunk_length = len(audio) // n_chunks  # Duration in milliseconds
     output_files = []
     for i in range(n_chunks):
-        chunk_output_filename = segment_name + "-" + str(i) + ".ogg"
+        chunk_output_filename = segment_name + "-" + str(i) + ".wav"
         chunk_output_filepath = os.path.join(output_filedir, chunk_output_filename)
         start_time = i * chunk_length
         end_time = (i + 1) * chunk_length if i != n_chunks - 1 else len(audio)
         chunk = audio[start_time:end_time]
         # Export chunk
-        chunk.export(chunk_output_filepath, format="ogg")
+        chunk.export(chunk_output_filepath, format="wav")
         output_files.append(chunk_output_filepath)
 
     return output_files
@@ -173,7 +173,7 @@ def process_ogg_files(
     """
     output_filedir = os.path.dirname(output_filepath)
     combined = AudioSegment.empty()
-    combined.export(output_filepath, format="ogg")
+    combined.export(output_filepath, format="wav")
     while len(audio_filepath_list) != 0:
         audio_file_uri = audio_filepath_list[0]
         try:
@@ -197,7 +197,7 @@ def process_ogg_files(
         else:
             combined += audio
             if get_audio_file_size(output_filepath) <= max_size_mb:
-                combined.export(output_filepath, format="ogg")
+                combined.export(output_filepath, format="wav")
                 audio_filepath_list = audio_filepath_list[1:]
             else:
                 break

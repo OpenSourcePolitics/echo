@@ -101,7 +101,7 @@ class AudioETLPipeline:
             while len(unprocessed_chunk_file_path_li) != 0:
                 state_chunk_file_path_li = unprocessed_chunk_file_path_li
                 output_filepath = os.path.join(
-                    self.segment_root_dir, conversation_id + "_" + str(counter) + ".ogg"
+                    self.segment_root_dir, conversation_id + "_" + str(counter) + ".wav"
                 )
                 unprocessed_chunk_file_path_li = process_ogg_files(
                     unprocessed_chunk_file_path_li,

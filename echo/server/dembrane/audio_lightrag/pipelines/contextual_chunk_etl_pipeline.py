@@ -2,7 +2,6 @@
 import os
 import glob
 import json
-from pydoc import text
 from logging import getLogger
 
 # import yaml
@@ -100,7 +99,7 @@ class ContextualChunkETLPipeline:
                             f"{self.api_base_url}/api/stateless/rag/insert",
                             json={"content": responses[row.conversationid_segmentfloat]['CONTEXTUAL_TRANSCRIPT'],
                                   "id": row.conversationid_segmentfloat,
-                                  "transcripts": [responses[row.conversationid_segmentfloat]['TRANSCRIPTS']]}
+                                  "transcripts": responses[row.conversationid_segmentfloat]['TRANSCRIPTS']}
                         )
 
                         if response.status_code == 200:

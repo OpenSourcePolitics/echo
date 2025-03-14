@@ -117,6 +117,7 @@ async def insert_item(request: Request, payload: InsertRequest) -> InsertRespons
         # Insert the content and create a default result dictionary
         # rag.insert("TEXT1", ids=["ID_FOR_TEXT1"])
         rag.insert(payload.content, ids=[payload.id])
+        await postgres_db.initdb()
         for transcript in payload.transcripts:
             await upsert_transcript(postgres_db, 
                                 document_id = str(payload.id), 
