@@ -85,7 +85,7 @@ class AudioETLPipeline:
             )
         )
         for project_id, conversation_id in zip_unique:
-            unprocessed_chunk_file_path_li = transform_process_tracker_df.loc[
+            unprocessed_chunk_file_uri_li = transform_process_tracker_df.loc[
                 (transform_process_tracker_df.project_id == project_id)
                 & (transform_process_tracker_df.conversation_id == conversation_id)
             ].path.to_list()
@@ -98,32 +98,32 @@ class AudioETLPipeline:
                 )
                 + 1
             )
-            while len(unprocessed_chunk_file_path_li) != 0:
-                state_chunk_file_path_li = unprocessed_chunk_file_path_li
+            while len(unprocessed_chunk_file_uri_li) != 0:
+                state_chunk_file_uri_li = unprocessed_chunk_file_uri_li
                 output_filepath = os.path.join(
                     self.segment_root_dir, conversation_id + "_" + str(counter) + ".wav"
                 )
-                unprocessed_chunk_file_path_li = process_ogg_files(
-                    unprocessed_chunk_file_path_li,
+                unprocessed_chunk_file_uri_li = process_ogg_files(
+                    unprocessed_chunk_file_uri_li,
                     output_filepath,
                     max_size_mb=float(self.max_size_mb),
                     counter=counter,
                     conversation_id=conversation_id,
                 )
-                processed_chunk_file_path_li = [
-                    x for x in state_chunk_file_path_li if x not in unprocessed_chunk_file_path_li
+                processed_chunk_file_uri_li = [
+                    x for x in state_chunk_file_uri_li if x not in unprocessed_chunk_file_uri_li
                 ]
                 # No processed chunk file case
-                if len(processed_chunk_file_path_li) == 0:
-                    error_file = unprocessed_chunk_file_path_li[0]
+                if len(processed_chunk_file_uri_li) == 0:
+                    error_file = unprocessed_chunk_file_uri_li[0]
                     segment_dict = {error_file.split("/")[-1][37:73]: -1}
-                    unprocessed_chunk_file_path_li = unprocessed_chunk_file_path_li[1:]
+                    unprocessed_chunk_file_uri_li = unprocessed_chunk_file_uri_li[1:]
                     self.process_tracker.update_segment(segment_dict)
                     logging.error(f"Error processing ogg file: {error_file}")
                 else:
                     segment_dict = {
                         file_path.split('/')[-1][37:73]: counter
-                        for file_path in processed_chunk_file_path_li
+                        for file_path in processed_chunk_file_uri_li
                     }  # chunk to counter
                     self.process_tracker.update_segment(segment_dict)
                     counter = counter + 1
