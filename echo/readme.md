@@ -196,6 +196,13 @@ If the Directus container does not start:
    ```
    - This syncs your Directus configuration.
 
+
+### 8.2 Docker Desktop Container Crashing
+
+In case your desktop crashes/ runs out of memory/ IDE freezes, try these steps: 
+- Increase allocates RAM to WSL[https://fizzylogic.nl/2023/01/05/how-to-configure-memory-limits-in-wsl2]
+- Reduce mypy load by excluding files[https://github.com/python/mypy/issues/17105]
+- Uninstall mypy
 ---
 
 ## 9. Final Setup Steps
