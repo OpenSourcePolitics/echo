@@ -1,4 +1,5 @@
 # mypy: disable-error-code="no-untyped-def"
+import os
 from typing import List
 
 from celery import Celery, chain, chord, group, signals  # type: ignore
@@ -753,7 +754,9 @@ def task_finish_conversation_hook(self, conversation_id: str):
         except Exception as e:
             logger.error(f"Error: {e}")
             pass
-        run_etl_pipeline_audio_lightrag([conversation_id])
+
+        if os.getenv("ENABLE_AUDIO_LIGHTRAG_INPUT"):
+            run_etl_pipeline_audio_lightrag([conversation_id])
 
     except Exception as e:
         logger.error(f"Error: {e}")
