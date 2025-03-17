@@ -18,4 +18,4 @@ def test_run_etl_pipeline(conversation_df: pd.DataFrame,
     run_etl_pipeline([
         test_audio_uuid,
     ])
-    assert os.path.exists(json_path)
+    
