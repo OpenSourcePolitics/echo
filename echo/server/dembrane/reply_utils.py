@@ -1,4 +1,5 @@
 from logging import getLogger
+from typing import AsyncGenerator
 
 import litellm
 from pydantic import BaseModel
@@ -70,8 +71,7 @@ def build_conversation_transcript(conversation: dict) -> str:
     return transcript
 
 
-def generate_reply_for_conversation(conversation_id: str, language: str) -> dict:
-    # might need to just use audio directly here
+async def generate_reply_for_conversation(conversation_id: str, language: str) -> AsyncGenerator[str, None]:
     conversation = directus.get_items(
         "conversation",
         {
@@ -230,35 +230,39 @@ def generate_reply_for_conversation(conversation_id: str, language: str) -> dict
         },
     )
 
-    response = litellm.completion(
+    # Store the complete response
+    accumulated_response = ""
+    
+    # Stream the response
+    response = await litellm.acompletion(
         model="anthropic/claude-3-5-sonnet-20240620",
-        # api_key=ANTHROPIC_API_KEY,
-        messages=[
-            {"role": "user", "content": prompt},
-            # prefill with a placeholder response
-            {"role": "assistant", "content": "<detailed_analysis>"},
-        ],
+        messages=[{"role": "user", "content": prompt}, {"role": "assistant", "content": "<response>"},],
+        stream=True
     )
 
-    response = response.choices[0].message.content
+    async for chunk in response:
+        if chunk.choices[0].delta.content:
+            content = chunk.choices[0].delta.content
+            accumulated_response += content
+            
+            # Remove any response tags that might appear
+            cleaned_content = content.replace("<response>", "").replace("</response>", "")
+            if cleaned_content.strip():  # Only yield non-empty content
+                yield cleaned_content
 
-    logger.debug(f"The Full Response: {response}")
-
-    # delete everything between <detailed_analysis> tags / general clean up
-    response = response.split("</detailed_analysis>")[1]
-    response = str(response).replace("<response>", "").replace("</response>", "").strip()
-
-    # create a reply
-    created_reply_object = directus.create_item(
-        "conversation_reply",
-        item_data={
-            "conversation_id": current_conversation.id,
-            "content_text": response,
-            "type": "assistant_reply",
-        },
-    )["data"]
-
-    return created_reply_object
+    # After streaming is complete, store in Directus
+    try:
+        directus.create_item(
+            "conversation_reply",
+            item_data={
+                "conversation_id": current_conversation.id,
+                "content_text": accumulated_response.strip(),
+                "type": "assistant_reply",
+            },
+        )
+    except Exception as e:
+        logger.error(f"Failed to store reply in Directus: {e}")
+        # Continue since we've already streamed the response to the user
 
 
 if __name__ == "__main__":

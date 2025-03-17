@@ -12,6 +12,7 @@ import {
   Button,
   Divider,
   Group,
+  Loader,
   LoadingOverlay,
   Menu,
   Modal,
@@ -387,27 +388,77 @@ const useConversationRepliesQuery = (conversationId: string | undefined) => {
 
 const useConversationReplyMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (payload: {
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
+  
+  const mutation = useMutation({
+    mutationFn: async ({
+      conversationId,
+      language,
+    }: {
       conversationId: string;
       language: string;
-    }) => {
-      const reply = await api.post(
-        `/conversations/${payload.conversationId}/get-reply`,
-        {
-          language: payload.language,
-        },
-      );
+    }): Promise<void> => {
+      setIsStreaming(true);
+      setStreamingContent("");
+      
+      try {
+        const response = await fetch(
+          `/api/conversations/${conversationId}/get-reply`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ language }),
+          }
+        );
 
-      return reply;
-    },
-    onSuccess: (_r, v) => {
-      queryClient.invalidateQueries({
-        queryKey: ["participant", "conversation_replies", v.conversationId],
-      });
+        if (!response.ok || !response.body) {
+          throw new Error('Network response was not ok');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = JSON.parse(line.slice(5));
+              setStreamingContent(prev => prev + data.content);
+            }
+          }
+        }
+
+        // Wait longer before invalidating to ensure Directus has saved
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Invalidate and wait for refetch
+        await queryClient.invalidateQueries({
+          queryKey: ["participant", "conversation_replies", conversationId],
+        });
+
+        // Don't clear streaming content - let it persist until page refresh
+      } finally {
+        setIsStreaming(false);
+        // setStreamingContent("");
+      }
     },
   });
+
+  return {
+    ...mutation,
+    isStreaming,
+    streamingContent,
+    mutateAsync: mutation.mutateAsync,
+  };
 };
+
+type ConversationReplyMutation = ReturnType<typeof useConversationReplyMutation>;
 
 const UserChunkMessage = ({
   chunk,
@@ -598,6 +649,8 @@ const ParticipantBody = ({
   const chunksQuery = useConversationChunksQuery(projectId, conversationId);
   const repliesQuery = useConversationRepliesQuery(conversationId);
 
+  console.log(projectQuery.data?.is_get_reply_enabled, "  ===> data")
+
   const combinedMessages = useMemo(() => {
     const userChunks = (chunksQuery.data ?? []).map((chunk) => ({
       type: "user_chunk" as const,
@@ -659,7 +712,7 @@ const ParticipantBody = ({
         src={WelcomeImage}
       />
       {projectQuery.data && (
-        <Stack ref={chatRef} py="md">
+        <Stack ref={chatRef} py="md" pb={9}>
           <Title order={3}>
             {projectQuery.data.default_conversation_title}
           </Title>
@@ -748,7 +801,7 @@ const ParticipantBody = ({
           <div
             role="presentation"
             ref={bottomRef}
-            style={{ float: "left", clear: "both" }}
+            style={{ float: "left", clear: "both", display: "none" }}
           ></div>
         </Stack>
       )}
@@ -756,7 +809,8 @@ const ParticipantBody = ({
   );
 };
 
-const DEFAULT_REPLY_COOLDOWN = 120; // 2 minutes in seconds
+// const DEFAULT_REPLY_COOLDOWN = 120; // 2 minutes in seconds
+const DEFAULT_REPLY_COOLDOWN = 0; // 2 minutes in seconds
 
 export const ParticipantConversationAudioRoute = () => {
   const { projectId, conversationId } = useParams();
@@ -818,7 +872,8 @@ export const ParticipantConversationAudioRoute = () => {
 
     const interval = setInterval(() => {
       const remaining = getRemainingCooldown();
-      setRemainingCooldown(remaining);
+      // setRemainingCooldown(remaining);
+      setRemainingCooldown(0);
 
       if (remaining <= 0) {
         clearInterval(interval);
@@ -842,6 +897,7 @@ export const ParticipantConversationAudioRoute = () => {
   const [showCooldownMessage, setShowCooldownMessage] = useState(false);
 
   const handleReply = async () => {
+    console.log("Echo clicked")
     const remaining = getRemainingCooldown();
     if (remaining > 0) {
       setShowCooldownMessage(true);
@@ -852,7 +908,7 @@ export const ParticipantConversationAudioRoute = () => {
           ? t`${minutes} minutes and ${seconds} seconds`
           : t`${seconds} seconds`;
 
-      alert(t`Please wait ${timeStr} before requesting another reply.`);
+      alert(t`Please wait ${timeStr} before requesting another echo.`);
       return;
     }
 
@@ -867,9 +923,10 @@ export const ParticipantConversationAudioRoute = () => {
         language: iso639_1,
       });
       setLastReplyTime(new Date());
-      setRemainingCooldown(DEFAULT_REPLY_COOLDOWN);
+      // setRemainingCooldown(DEFAULT_REPLY_COOLDOWN);
+      setRemainingCooldown(0);
     } catch (error) {
-      console.error("Error during reply:", error);
+      console.error("Error during echo:", error);
     }
   };
 
@@ -888,7 +945,7 @@ export const ParticipantConversationAudioRoute = () => {
   };
 
   return (
-    <div className="container mx-auto flex h-full max-w-2xl grow flex-col">
+    <div className="container mx-auto flex h-full max-w-2xl flex-col">
       {/* modal for permissions error */}
       <Modal
         opened={!!permissionError}
@@ -942,6 +999,28 @@ export const ParticipantConversationAudioRoute = () => {
             conversationId={conversationId ?? ""}
           />
         )}
+
+        {/* Show streaming content in a chat bubble */}
+        {(getReplyMutation.isStreaming || getReplyMutation.streamingContent) && (
+          <div className="flex justify-start">
+            <Paper className="rounded-t-xl rounded-br-xl p-4">
+              <Stack>
+                <Group>
+                  <Text className="font-semibold">
+                    <Trans>ECHO!</Trans>
+                  </Text>
+                  <Logo hideTitle h="20px" />
+                  {getReplyMutation.isStreaming && (
+                    <Loader size="sm" type="dots"/>
+                  )}
+                </Group>
+                <Text className="prose text-sm">
+                  <Markdown content={getReplyMutation.streamingContent} />
+                </Text>
+              </Stack>
+            </Paper>
+          </div>
+        )}
       </Box>
 
       {!errored && (
@@ -959,10 +1038,12 @@ export const ParticipantConversationAudioRoute = () => {
                   size="xl"
                   rightSection={
                     <div className="pl-2">
-                      <Logo hideTitle />
+                      <Logo />
                     </div>
                   }
                   onClick={handleReply}
+                  loading={getReplyMutation.isStreaming}
+                  loaderProps={{ type: "dots" }}
                 >
                   {showCooldownMessage && remainingCooldown > 0 ? (
                     <Text>
