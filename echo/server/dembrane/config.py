@@ -191,11 +191,15 @@ logger.debug("AZURE_EMBEDDING_API_KEY: set")
 # assert DIRECTUS_SESSION_TOKEN, "DIRECTUS_SESSION_TOKEN environment variable is not set"
 # logger.debug("DIRECTUS_SESSION_TOKEN: set")
 
-AUDIO_LIGHTRAG_DOWNLOAD_DIR = os.environ.get("AUDIO_LIGHTRAG_DOWNLOAD_DIR", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data"))
+AUDIO_LIGHTRAG_DATA_DIR = os.environ.get("AUDIO_LIGHTRAG_DATA_DIR", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data"))
+assert AUDIO_LIGHTRAG_DATA_DIR, "AUDIO_LIGHTRAG_DATA_DIR environment variable is not set"
+logger.debug("AUDIO_LIGHTRAG_DATA_DIR: set")
+
+AUDIO_LIGHTRAG_DOWNLOAD_DIR = os.environ.get("AUDIO_LIGHTRAG_DOWNLOAD_DIR", AUDIO_LIGHTRAG_DATA_DIR)
 assert AUDIO_LIGHTRAG_DOWNLOAD_DIR, "AUDIO_LIGHTRAG_DOWNLOAD_DIR environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_DOWNLOAD_DIR: set")
 
-AUDIO_LIGHTRAG_SEGMENT_DIR = os.environ.get("AUDIO_LIGHTRAG_SEGMENT_DIR", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data"))
+AUDIO_LIGHTRAG_SEGMENT_DIR = os.environ.get("AUDIO_LIGHTRAG_SEGMENT_DIR", AUDIO_LIGHTRAG_DATA_DIR)
 assert AUDIO_LIGHTRAG_SEGMENT_DIR, "AUDIO_LIGHTRAG_SEGMENT_DIR environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_SEGMENT_DIR: set")
 
@@ -203,7 +207,7 @@ AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB = os.environ.get("AUDIO_LIGHTRAG_MAX_AUDIO
 assert AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB, "AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB: set")
 
-AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH = os.environ.get("AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data"))
+AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH = os.environ.get("AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH", AUDIO_LIGHTRAG_DATA_DIR)
 assert AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH, "AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH: set")
 

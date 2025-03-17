@@ -18,6 +18,7 @@ from fastapi.openapi.utils import get_openapi
 from lightrag.kg.postgres_impl import PostgreSQLDB
 from lightrag.llm.azure_openai import azure_openai_complete
 from starlette.middleware.cors import CORSMiddleware
+from lightrag.kg.shared_storage import initialize_pipeline_status
 
 from dembrane.config import (
     ADMIN_BASE_URL,
@@ -31,7 +32,6 @@ from dembrane.audio_lightrag.utils.lightrag_utils import embedding_func, check_a
 nest_asyncio.apply()
 
 logger = getLogger("server")
-print('**********', os.environ.get("NEO4J_USERNAME"))
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
@@ -67,10 +67,12 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
         graph_storage="Neo4JStorage",
         vector_storage="PGVectorStorage",
         vector_db_storage_cls_kwargs={
-            "cosine_better_than_threshold": 0.7
+            "cosine_better_than_threshold": 0.4
         }
     )
-    
+
+    await _app.state.rag.initialize_storages()
+    await initialize_pipeline_status()
     logger.info("RAG object has been initialized")
 
     yield

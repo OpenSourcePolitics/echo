@@ -135,11 +135,15 @@ async def query_item(request: Request, payload: QueryRequest) -> QueryResponse:
     if rag is None:
         raise HTTPException(status_code=500, detail="RAG object not initialized")
     try:
-        result = rag.query(payload.query, param=QueryParam(mode="local"))
+        result = rag.query(payload.query, param=QueryParam(mode="mix"))
+        print(f'*********{result}*********')
+        await postgres_db.initdb()
         transcripts = await fetch_query_transcript(postgres_db, 
                                             str(result), 
                                             ids = payload.id if payload.id else None)
-        return QueryResponse(status="success", result=result, transcripts=transcripts)
+        # Extract just the content from the transcripts
+        transcript_contents = [t['content'] for t in transcripts] if isinstance(transcripts, list) else [transcripts['content']] # type: ignore
+        return QueryResponse(status="success", result=result, transcripts=transcript_contents)
     except Exception as e:
         logger.exception("Query operation failed")
         raise HTTPException(status_code=500, detail=str(e)) from e

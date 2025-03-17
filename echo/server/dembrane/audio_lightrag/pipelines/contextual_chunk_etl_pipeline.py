@@ -47,7 +47,7 @@ class ContextualChunkETLPipeline:
     
         # self.config = self.load_config(config_path)
         self.output_json_filepath = AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH
-        self.audio_filepath_li = glob.glob(AUDIO_LIGHTRAG_SEGMENT_DIR+'/*')
+        self.audio_filepath_li = glob.glob(AUDIO_LIGHTRAG_SEGMENT_DIR+'/*.wav')
         self.conversation_history_num = AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM
         # Create a temporary dataframe to maintain order of file: Big files in have '*_1-1.*' type of names 
         self.temp_segments_df = pd.DataFrame({'audio_filepath':self.audio_filepath_li})

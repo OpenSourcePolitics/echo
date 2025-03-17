@@ -1,7 +1,10 @@
+import os
+
 import pandas as pd
 from dotenv import load_dotenv
 
 from dembrane.config import (
+    AUDIO_LIGHTRAG_DATA_DIR,
     AZURE_OPENAI_AUDIOMODEL_API_KEY,
     AZURE_OPENAI_AUDIOMODEL_ENDPOINT,
     AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH,
@@ -27,6 +30,8 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
     """
     Runs the complete ETL pipeline including Directus, Audio, Contextual Chunk, and Lightrag processes.
     """
+    if not os.path.exists(AUDIO_LIGHTRAG_DATA_DIR):
+        os.makedirs(AUDIO_LIGHTRAG_DATA_DIR)
     
     # Run Directus ETL
     directus_pl = DirectusETLPipeline()
@@ -55,7 +60,7 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
     contextual_chunk_pl.run()
     process_tracker.delete_temps()
 
-if __name__ == "__main__":
-    run_etl_pipeline([
-        '02a12e46-7c33-4b78-9ab1-a5581f75c279',  # wav
-    ])
+# if __name__ == "__main__":
+#     run_etl_pipeline([
+#         '02a12e46-7c33-4b78-9ab1-a5581f75c279',  # wav
+#     ])
