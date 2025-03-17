@@ -42,8 +42,8 @@ def get_json_dict_from_audio(wav_loc: str,
         ]
     audio_model_generation = audio_model_client.chat.completions.create(
             model="gpt-4o-audio-preview",
-            messages = audio_model_messages
-        )
+            messages = audio_model_messages # type: ignore
+        ) 
     audio_model_generation_content = audio_model_generation.choices[0].message.content
     text_structuring_model_messages = [
         {
@@ -68,7 +68,7 @@ def get_json_dict_from_audio(wav_loc: str,
             ]
     text_structuring_model_generation = text_structuring_model_client.beta.chat.completions.parse(
             model= text_structuring_model_name,
-            messages = text_structuring_model_messages,
+            messages = text_structuring_model_messages, # type: ignore
             response_format=Transctiptions,
         )
-    return json.loads(text_structuring_model_generation.choices[0].message.content)
+    return json.loads(text_structuring_model_generation.choices[0].message.content) # type: ignore

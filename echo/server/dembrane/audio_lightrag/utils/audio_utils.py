@@ -3,10 +3,9 @@ import base64
 import logging
 from io import BytesIO
 
-import requests
 from pydub import AudioSegment
 
-from dembrane.s3 import get_stream_from_s3, get_sanitized_s3_key, get_file_size_from_s3_mb
+from dembrane.s3 import get_stream_from_s3, get_file_size_from_s3_mb
 from dembrane.directus import directus
 
 
@@ -158,7 +157,7 @@ def split_ogg_to_chunks(
         end_time = (i + 1) * chunk_length if i != n_chunks - 1 else len(audio)
         chunk = audio[start_time:end_time]
         # Export chunk
-        chunk.export(chunk_output_filepath, format="wav")
+        chunk.export(chunk_output_filepath, format="wav") # type: ignore
         output_files.append(chunk_output_filepath)
 
     return output_files

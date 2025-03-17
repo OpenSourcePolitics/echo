@@ -44,7 +44,7 @@ async def upsert_transcript(db: PostgreSQLDB,
         id = str(document_id) + '_' + str(int(hashlib.sha256(s.encode('utf-8')).hexdigest(), 16) % 10**8)
     
     content_embedding = await embedding_func([content])
-    content_embedding = '[' + ','.join([str(x) for x in content_embedding[0]]) + ']'
+    content_embedding = '[' + ','.join([str(x) for x in content_embedding[0]]) + ']' # type: ignore
 
     sql = SQL_TEMPLATES["UPSERT_TRANSCRIPT"].format(id=id, 
                                                     document_id=document_id, 
@@ -63,7 +63,7 @@ async def fetch_query_transcript(db: PostgreSQLDB,
     
     
     query_embedding = await embedding_func([query])
-    query_embedding = ','.join([str(x) for x in query_embedding[0]])
+    query_embedding = ','.join([str(x) for x in query_embedding[0]]) # type: ignore
     sql = SQL_TEMPLATES["QUERY_TRANSCRIPT"].format(
         embedding_string=query_embedding, limit=limit, doc_ids=ids)
     result = await db.query(sql, multirows=True)
