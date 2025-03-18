@@ -30,18 +30,18 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
     """
     Runs the complete ETL pipeline including Directus, Audio, Contextual Chunk, and Lightrag processes.
     """
-    if not os.path.exists(AUDIO_LIGHTRAG_DATA_DIR):
-        os.makedirs(AUDIO_LIGHTRAG_DATA_DIR)
+    # if not os.path.exists(AUDIO_LIGHTRAG_DATA_DIR):
+    #     os.makedirs(AUDIO_LIGHTRAG_DATA_DIR)
     
     # Run Directus ETL
     directus_pl = DirectusETLPipeline()
-    directus_pl.run(conv_id_list)
+    process_tracker = directus_pl.run(conv_id_list)
 
     # Initialize process tracker
-    process_tracker = ProcessTracker(
-        conversation_df=pd.read_csv(AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH),
-        project_df=pd.read_csv(AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH).set_index('id')
-    )
+    # process_tracker = ProcessTracker(
+    #     conversation_df=pd.read_csv(AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH),
+    #     project_df=pd.read_csv(AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH).set_index('id')
+    # )
 
     # Run Audio ETL
     audio_pl = AudioETLPipeline(process_tracker)
@@ -58,9 +58,3 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
                                                      text_structuring_model_name = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME)
                                                      )
     contextual_chunk_pl.run()
-    process_tracker.delete_temps()
-
-# if __name__ == "__main__":
-#     run_etl_pipeline([
-#         '02a12e46-7c33-4b78-9ab1-a5581f75c279',  # wav
-#     ])

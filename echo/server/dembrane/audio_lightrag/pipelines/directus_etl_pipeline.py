@@ -9,9 +9,8 @@ from directus_sdk_py import DirectusClient
 from dembrane.config import (
     DIRECTUS_TOKEN,
     DIRECTUS_BASE_URL,
-    AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH,
-    AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH,
 )
+from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
 logger = logging.getLogger("dembrane.audio_lightrag.pipelines.directus_etl_pipeline")
 
@@ -30,7 +29,8 @@ class DirectusETLPipeline:
                                                 ["id", "name", "language", "context", 
                                                 "default_conversation_title", 
                                                 "default_conversation_description"], 
-                                           "limit": 100000}}
+                                           "limit": 100000,
+                                           "filter": {"id": {"_in": []}}}}
         self.conversation_request = {"query": 
                                      {"fields": ["id", "project_id", 
                                                  "chunks.id", "chunks.path", 
@@ -44,12 +44,6 @@ class DirectusETLPipeline:
 
         # Initialize the Directus client using sensitive info from environment variables
         self.directus_client = DirectusClient(DIRECTUS_BASE_URL, DIRECTUS_TOKEN)
-        
-
-    # def load_config(self, config_path: str) -> Dict[str, Any]:
-    #     """Load the configuration file."""
-    #     with open(config_path, "r") as file:
-    #         return yaml.safe_load(file)
 
     def extract(self, conversation_id_list: Optional[List[str]] = None) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -60,6 +54,8 @@ class DirectusETLPipeline:
         if conversation_id_list is not None:
             self.conversation_request['query']['filter'] = {'id': {'_in': conversation_id_list}}
         conversation = self.directus_client.get_items("conversation", self.conversation_request)
+        project_id_list = list(set([conversation_request['project_id'] for conversation_request in conversation]))
+        self.project_request['query']['filter'] = {'id': {'_in': project_id_list}}
         project = self.directus_client.get_items("project", self.project_request)
         return conversation, project
 
@@ -112,44 +108,17 @@ class DirectusETLPipeline:
 
         return conversation_df, project_df
 
-    def load_df_to_directory(self, 
-                             conversation_df: pd.DataFrame, 
-                             project_df: pd.DataFrame,
-                             conversation_output_path: str,
-                             project_output_path: str) -> None:
+    def load_to_process_tracker(self, 
+                                conversation_df: pd.DataFrame, 
+                                project_df: pd.DataFrame) -> ProcessTracker:
         """
-        Load the transformed data to CSV files.
+        Load the transformed data to a process tracker.
         """
-        conversation_df.rename(columns = {"id": "conversation_id"}).to_csv(conversation_output_path, index=False)
-        project_df.to_csv(project_output_path, index=True)
+        return ProcessTracker(conversation_df, project_df)
 
-        print(f"Conversation data saved to {conversation_output_path}")
-        print(f"Project data saved to {project_output_path}")
-
-    def run(self, 
-            conversation_id_list: Optional[List[str]] = None,
-            conversation_output_path: str | None = None,
-            project_output_path: str | None = None) -> None:
+    def run(self, conversation_id_list: Optional[List[str]] = None) -> ProcessTracker:
         """Run the full ETL pipeline: extract, transform, and load."""
-        if conversation_output_path is None:
-            conversation_output_path = AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH
-        if project_output_path is None:
-            project_output_path = AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH
         conversation, project = self.extract(conversation_id_list=conversation_id_list)
         conversation_df, project_df = self.transform(conversation, project)
-        self.load_df_to_directory(conversation_df, 
-                                  project_df, 
-                                  conversation_output_path, 
-                                  project_output_path)
-
-
-if __name__ == "__main__":
-    from dotenv import load_dotenv
-    load_dotenv()
-    pipeline = DirectusETLPipeline()
-    pipeline.run([
-            '02a12e46-7c33-4b78-9ab1-a5581f75c279',  # wav
-            '9319fe3a-1c24-42d9-8750-4080f9197864',  # mp3
-            '55b93782-cf12-4cc3-b6e8-2815997f7bde',  # m4a
-            '35e13074-5f42-41de-b6c4-c2e651850730'   # mp4
-        ])
+        process_tracker = self.load_to_process_tracker(conversation_df, project_df)
+        return process_tracker
