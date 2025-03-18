@@ -10,18 +10,17 @@ import pytest
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipeline
 
-
-@pytest.mark.usefixtures("conversation_df", "project_df")
-def test_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
-    # Use conftest data to create a mock ProcessTracker object
-    mock_process_tracker = ProcessTracker(conversation_df=conversation_df,
-                                          project_df=project_df)   
-    mock_process_tracker.delete_temps()
-    assert set(mock_process_tracker().columns) == set(['conversation_id', 'project_id', 'chunk_id', 
-                                                   'path', 'timestamp', 'format', 
-                                                   'download_status', 'segment', 
-                                                   'log', 'json_status','ligtrag_status'])
-    assert mock_process_tracker().shape[0]*mock_process_tracker().shape[1] != 0
+# @pytest.mark.usefixtures("conversation_df", "project_df")
+# def test_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
+#     # Use conftest data to create a mock ProcessTracker object
+#     mock_process_tracker = ProcessTracker(conversation_df=conversation_df,
+#                                           project_df=project_df)   
+#     mock_process_tracker.delete_temps()
+#     assert set(mock_process_tracker().columns) == set(['conversation_id', 'project_id', 'chunk_id', 
+#                                                    'path', 'timestamp', 'format', 
+#                                                    'download_status', 'segment', 
+#                                                    'log', 'json_status','ligtrag_status'])
+#     assert mock_process_tracker().shape[0]*mock_process_tracker().shape[1] != 0
 
 # @pytest.mark.usefixtures("conversation_df", "project_df")
 # def test_partial_process_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:

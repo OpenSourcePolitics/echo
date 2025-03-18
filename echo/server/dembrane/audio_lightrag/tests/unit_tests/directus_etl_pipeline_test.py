@@ -14,9 +14,10 @@ class TestDirectusETLPipeline:
     @pytest.fixture
     def directus_etl_pipeline(self) -> DirectusETLPipeline:
         return DirectusETLPipeline()
-
-    def test_run(self, directus_etl_pipeline: DirectusETLPipeline) -> None:
-        process_tracker = directus_etl_pipeline.run()
+    @pytest.mark.usefixtures("test_audio_uuid")
+    def test_run(self, directus_etl_pipeline: DirectusETLPipeline, 
+                test_audio_uuid: str) -> None:
+        process_tracker = directus_etl_pipeline.run([test_audio_uuid])
         assert process_tracker().shape[0] * process_tracker().shape[1] > 0
 
 if __name__ == '__main__':
