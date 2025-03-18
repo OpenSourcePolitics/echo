@@ -163,7 +163,7 @@ def split_ogg_to_chunks(
     return output_files
 
 def process_ogg_files(
-    audio_filepath_list: list[str], output_filepath: str, 
+    unprocessed_chunk_file_uri_li: list[str], output_filepath: str, 
     max_size_mb: float, conversation_id: str , counter: int, 
 ) -> list[str]:
     """
@@ -173,8 +173,8 @@ def process_ogg_files(
     output_filedir = os.path.dirname(output_filepath)
     combined = AudioSegment.empty()
     combined.export(output_filepath, format="wav")
-    while len(audio_filepath_list) != 0:
-        audio_file_uri = audio_filepath_list[0]
+    while len(unprocessed_chunk_file_uri_li) != 0:
+        audio_file_uri = unprocessed_chunk_file_uri_li[0]
         try:
             audio_stream = get_stream_from_s3(audio_file_uri)
             audio = AudioSegment.from_file(BytesIO(audio_stream.read()), format="ogg")
@@ -190,17 +190,17 @@ def process_ogg_files(
                                 n_sub_chunks, 
                                 counter, 
                                 output_filedir)
-            audio_filepath_list = audio_filepath_list[1:]
+            unprocessed_chunk_file_uri_li = unprocessed_chunk_file_uri_li[1:]
             os.remove(output_filepath)
             break
         else:
             combined += audio
             if get_audio_file_size(output_filepath) <= max_size_mb:
                 combined.export(output_filepath, format="wav")
-                audio_filepath_list = audio_filepath_list[1:]
+                unprocessed_chunk_file_uri_li = unprocessed_chunk_file_uri_li[1:]
             else:
                 break
-    return audio_filepath_list
+    return unprocessed_chunk_file_uri_li
 
 def ogg_to_str(ogg_file_path: str) -> str:
     with open(ogg_file_path, "rb") as file:

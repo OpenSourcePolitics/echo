@@ -40,41 +40,9 @@ class AudioETLPipeline:
         self.max_size_mb = AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB
 
     def extract(self) -> None: pass
-        # # Get unique project and conversation IDs
-        # zip_unique = list(
-        #     set(zip(self.process_tracker_df.project_id, self.process_tracker_df.conversation_id))
-        # )
-
-        # for project_id, conversation_id in zip_unique:
-        #     # Get unique chunk IDs for each project and conversation
-        #     chunk_li = self.process_tracker_df.loc[
-        #         (self.process_tracker_df.project_id == project_id)
-        #         & (self.process_tracker_df.conversation_id == conversation_id)
-        #     ].chunk_id.unique()
-
-
-
-        #     for chunk_id in chunk_li:
-        #         file_extension = self.process_tracker()[
-        #             self.process_tracker().chunk_id == chunk_id
-        #         ].format.unique()[0]
-
-        #         # Download audio file for each chunk as a WAV file
-        #         download_file_path = 
-
-        #         if file_extension == "mp4":
-        #             pass  # TODO: implement mp4 to wav
-
-        #         # Update process tracker with download status
-        #         if download_file_path is not None:
-        #             self.process_tracker.update_download_status(conversation_id, chunk_id, "pass")
-        #         else:
-        #             self.process_tracker.update_download_status(conversation_id, chunk_id, "fail")
 
     def transform(self) -> None:
-        transform_process_tracker_df = self.process_tracker_df[
-            (self.process_tracker_df.segment.isna() == True)
-        ]
+        transform_process_tracker_df = self.process_tracker.get_unprocesssed_process_tracker_df('segment')
         zip_unique = list(
             set(
                 zip(

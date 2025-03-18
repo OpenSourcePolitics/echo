@@ -45,48 +45,42 @@ class ProcessTracker:
     def __call__(self) -> pd.DataFrame:
         return self.df
     
-    def update_download_status(self, conversation_id: int, chunk_id: int, status: str) -> None:
-        """
-        Update the download status of a given conversation and chunk id.
+    # def update_download_status(self, conversation_id: int, chunk_id: int, status: str) -> None:
+    #     """
+    #     Update the download status of a given conversation and chunk id.
 
-        Args:
-        - conversation_id (int): The id of the conversation.
-        - chunk_id (int): The id of the chunk.
-        - status (str): The status of the download. Should be either 'pass' or 'fail'.
-        """
-        self.df.loc[(self.df.conversation_id == conversation_id) & 
-                    (self.df.chunk_id == chunk_id), 'download_status'] = status
-        self.save_df()
+    #     Args:
+    #     - conversation_id (int): The id of the conversation.
+    #     - chunk_id (int): The id of the chunk.
+    #     - status (str): The status of the download. Should be either 'pass' or 'fail'.
+    #     """
+    #     self.df.loc[(self.df.conversation_id == conversation_id) & 
+    #                 (self.df.chunk_id == chunk_id), 'download_status'] = status
+    #     self.save_df()
 
-    def update_segment(self, dict: dict) -> None:
-        """
-        Update the segment column of the DataFrame with the given
-        dictionary.
+    # def update_segment(self, dict: dict) -> None:
+    #     """
+    #     Update the segment column of the DataFrame with the given
+    #     dictionary.
 
-        Args:
-        - dict (dict): A dictionary where the keys are chunk ids and the values
-        are the segment numbers.
-        """
-        for chunk_id, segment in dict.items():
-            # Update the segment column
-            self.df.loc[(self.df.chunk_id == chunk_id), 'segment'] = segment
-        # Save the DataFrame
-        self.save_df()
+    #     Args:
+    #     - dict (dict): A dictionary where the keys are chunk ids and the values
+    #     are the segment numbers.
+    #     """
+    #     for chunk_id, segment in dict.items():
+    #         # Update the segment column
+    #         self.df.loc[(self.df.chunk_id == chunk_id), 'segment'] = segment
+    #     # Save the DataFrame
+    #     self.save_df()
         
-    def update_json_status(self, conversation_id: int, segment: float, status: str) -> None:
-        self.df.loc[(self.df.conversation_id == conversation_id) & (self.df.segment == segment), 'json_status'] = status
-        self.save_df()
+    # def update_json_status(self, conversation_id: int, segment: float, status: str) -> None:
+    #     self.df.loc[(self.df.conversation_id == conversation_id) & (self.df.segment == segment), 'json_status'] = status
+    #     self.save_df()
 
-    def update_ligtrag_status(self, conversation_id: int, segment: float, status: str) -> None:
-        self.df.loc[(self.df.conversation_id == conversation_id) & (self.df.segment == segment), 'ligtrag_status'] = status
-        self.save_df()
+    # def update_ligtrag_status(self, conversation_id: int, segment: float, status: str) -> None:
+    #     self.df.loc[(self.df.conversation_id == conversation_id) & (self.df.segment == segment), 'ligtrag_status'] = status
+    #     self.save_df()
 
-    def save_df(self) -> None:
-        """
-        Save the DataFrame to the given path.
-        """
-        self.df.to_csv(self.process_tracker_df_path, index=False)
-    
     def get_project_df(self) -> pd.DataFrame: 
         return self.project_df
     
@@ -95,3 +89,17 @@ class ProcessTracker:
             shutil.rmtree(temp_dir)
             os.makedirs(temp_dir)
 
+    # def save_df(self) -> None:
+    #     """
+    #     Save the DataFrame to the given path.
+    #     """
+    #     self.df.to_csv(self.process_tracker_df_path, index=False)
+    
+    def get_unprocesssed_process_tracker_df(self, column_name: str) -> pd.DataFrame:
+        return self.df[self.df[column_name].isna()]
+    
+    def update_status(self, conversation_id: int, chunk_id: int, 
+                      column_name: str, status: str) -> None:
+        self.df.loc[(self.df.conversation_id == conversation_id) 
+                    & (self.df.chunk_id == chunk_id), column_name] = status
+        # self.save_df()
