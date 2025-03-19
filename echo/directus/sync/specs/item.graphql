@@ -95,6 +95,10 @@ type Query {
   quote_conversation_chunk_by_id(id: ID!, version: String): quote_conversation_chunk
   quote_conversation_chunk_aggregated(groupBy: [String], filter: quote_conversation_chunk_filter, limit: Int, offset: Int, page: Int, search: String, sort: [String]): [quote_conversation_chunk_aggregated!]!
   quote_conversation_chunk_by_version(version: String!, id: ID!): version_quote_conversation_chunk
+  conversation_segment(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String): [conversation_segment!]!
+  conversation_segment_by_id(id: ID!, version: String): conversation_segment
+  conversation_segment_aggregated(groupBy: [String], filter: conversation_segment_filter, limit: Int, offset: Int, page: Int, search: String, sort: [String]): [conversation_segment_aggregated!]!
+  conversation_segment_by_version(version: String!, id: ID!): version_conversation_segment
   conversation_segment_conversation_chunk(filter: conversation_segment_conversation_chunk_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String): [conversation_segment_conversation_chunk!]!
   conversation_segment_conversation_chunk_by_id(id: ID!, version: String): conversation_segment_conversation_chunk
   conversation_segment_conversation_chunk_aggregated(groupBy: [String], filter: conversation_segment_conversation_chunk_filter, limit: Int, offset: Int, page: Int, search: String, sort: [String]): [conversation_segment_conversation_chunk_aggregated!]!
@@ -103,10 +107,6 @@ type Query {
   conversation_segment_conversation_chunk_1_by_id(id: ID!, version: String): conversation_segment_conversation_chunk_1
   conversation_segment_conversation_chunk_1_aggregated(groupBy: [String], filter: conversation_segment_conversation_chunk_1_filter, limit: Int, offset: Int, page: Int, search: String, sort: [String]): [conversation_segment_conversation_chunk_1_aggregated!]!
   conversation_segment_conversation_chunk_1_by_version(version: String!, id: ID!): version_conversation_segment_conversation_chunk_1
-  conversation_segment(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String): [conversation_segment!]!
-  conversation_segment_by_id(id: ID!, version: String): conversation_segment
-  conversation_segment_aggregated(groupBy: [String], filter: conversation_segment_filter, limit: Int, offset: Int, page: Int, search: String, sort: [String]): [conversation_segment_aggregated!]!
-  conversation_segment_by_version(version: String!, id: ID!): version_conversation_segment
   lightrag_vdb_transcript(filter: lightrag_vdb_transcript_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String): [lightrag_vdb_transcript!]!
   lightrag_vdb_transcript_by_id(id: ID!, version: String): lightrag_vdb_transcript
   lightrag_vdb_transcript_aggregated(groupBy: [String], filter: lightrag_vdb_transcript_filter, limit: Int, offset: Int, page: Int, search: String, sort: [String]): [lightrag_vdb_transcript_aggregated!]!
@@ -162,12 +162,12 @@ type Mutation {
   create_quote_aspect_1_item(data: create_quote_aspect_1_input!): quote_aspect_1
   create_quote_conversation_chunk_items(filter: quote_conversation_chunk_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [create_quote_conversation_chunk_input!]): [quote_conversation_chunk!]!
   create_quote_conversation_chunk_item(data: create_quote_conversation_chunk_input!): quote_conversation_chunk
+  create_conversation_segment_items(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [create_conversation_segment_input!]): [conversation_segment!]!
+  create_conversation_segment_item(data: create_conversation_segment_input!): conversation_segment
   create_conversation_segment_conversation_chunk_items(filter: conversation_segment_conversation_chunk_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [create_conversation_segment_conversation_chunk_input!]): [conversation_segment_conversation_chunk!]!
   create_conversation_segment_conversation_chunk_item(data: create_conversation_segment_conversation_chunk_input!): conversation_segment_conversation_chunk
   create_conversation_segment_conversation_chunk_1_items(filter: conversation_segment_conversation_chunk_1_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [create_conversation_segment_conversation_chunk_1_input!]): [conversation_segment_conversation_chunk_1!]!
   create_conversation_segment_conversation_chunk_1_item(data: create_conversation_segment_conversation_chunk_1_input!): conversation_segment_conversation_chunk_1
-  create_conversation_segment_items(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [create_conversation_segment_input!]): [conversation_segment!]!
-  create_conversation_segment_item(data: create_conversation_segment_input!): conversation_segment
   create_lightrag_vdb_transcript_items(filter: lightrag_vdb_transcript_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [create_lightrag_vdb_transcript_input!]): [lightrag_vdb_transcript!]!
   create_lightrag_vdb_transcript_item(data: create_lightrag_vdb_transcript_input!): lightrag_vdb_transcript
   update_directus_sync_id_map_items(filter: directus_sync_id_map_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, ids: [ID]!, data: update_directus_sync_id_map_input!): [directus_sync_id_map!]!
@@ -242,15 +242,15 @@ type Mutation {
   update_quote_conversation_chunk_items(filter: quote_conversation_chunk_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, ids: [ID]!, data: update_quote_conversation_chunk_input!): [quote_conversation_chunk!]!
   update_quote_conversation_chunk_batch(filter: quote_conversation_chunk_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [update_quote_conversation_chunk_input!]): [quote_conversation_chunk!]!
   update_quote_conversation_chunk_item(id: ID!, data: update_quote_conversation_chunk_input!): quote_conversation_chunk
+  update_conversation_segment_items(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, ids: [ID]!, data: update_conversation_segment_input!): [conversation_segment!]!
+  update_conversation_segment_batch(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [update_conversation_segment_input!]): [conversation_segment!]!
+  update_conversation_segment_item(id: ID!, data: update_conversation_segment_input!): conversation_segment
   update_conversation_segment_conversation_chunk_items(filter: conversation_segment_conversation_chunk_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, ids: [ID]!, data: update_conversation_segment_conversation_chunk_input!): [conversation_segment_conversation_chunk!]!
   update_conversation_segment_conversation_chunk_batch(filter: conversation_segment_conversation_chunk_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [update_conversation_segment_conversation_chunk_input!]): [conversation_segment_conversation_chunk!]!
   update_conversation_segment_conversation_chunk_item(id: ID!, data: update_conversation_segment_conversation_chunk_input!): conversation_segment_conversation_chunk
   update_conversation_segment_conversation_chunk_1_items(filter: conversation_segment_conversation_chunk_1_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, ids: [ID]!, data: update_conversation_segment_conversation_chunk_1_input!): [conversation_segment_conversation_chunk_1!]!
   update_conversation_segment_conversation_chunk_1_batch(filter: conversation_segment_conversation_chunk_1_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [update_conversation_segment_conversation_chunk_1_input!]): [conversation_segment_conversation_chunk_1!]!
   update_conversation_segment_conversation_chunk_1_item(id: ID!, data: update_conversation_segment_conversation_chunk_1_input!): conversation_segment_conversation_chunk_1
-  update_conversation_segment_items(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, ids: [ID]!, data: update_conversation_segment_input!): [conversation_segment!]!
-  update_conversation_segment_batch(filter: conversation_segment_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [update_conversation_segment_input!]): [conversation_segment!]!
-  update_conversation_segment_item(id: ID!, data: update_conversation_segment_input!): conversation_segment
   update_lightrag_vdb_transcript_items(filter: lightrag_vdb_transcript_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, ids: [ID]!, data: update_lightrag_vdb_transcript_input!): [lightrag_vdb_transcript!]!
   update_lightrag_vdb_transcript_batch(filter: lightrag_vdb_transcript_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String, data: [update_lightrag_vdb_transcript_input!]): [lightrag_vdb_transcript!]!
   update_lightrag_vdb_transcript_item(id: ID!, data: update_lightrag_vdb_transcript_input!): lightrag_vdb_transcript
@@ -302,12 +302,12 @@ type Mutation {
   delete_quote_aspect_1_item(id: ID!): delete_one
   delete_quote_conversation_chunk_items(ids: [ID]!): delete_many
   delete_quote_conversation_chunk_item(id: ID!): delete_one
+  delete_conversation_segment_items(ids: [ID]!): delete_many
+  delete_conversation_segment_item(id: ID!): delete_one
   delete_conversation_segment_conversation_chunk_items(ids: [ID]!): delete_many
   delete_conversation_segment_conversation_chunk_item(id: ID!): delete_one
   delete_conversation_segment_conversation_chunk_1_items(ids: [ID]!): delete_many
   delete_conversation_segment_conversation_chunk_1_item(id: ID!): delete_one
-  delete_conversation_segment_items(ids: [ID]!): delete_many
-  delete_conversation_segment_item(id: ID!): delete_one
   delete_lightrag_vdb_transcript_items(ids: [ID]!): delete_many
   delete_lightrag_vdb_transcript_item(id: ID!): delete_one
 }
@@ -358,9 +358,9 @@ type Subscription {
   quote_aspect_mutated(event: EventEnum): quote_aspect_mutated
   quote_aspect_1_mutated(event: EventEnum): quote_aspect_1_mutated
   quote_conversation_chunk_mutated(event: EventEnum): quote_conversation_chunk_mutated
+  conversation_segment_mutated(event: EventEnum): conversation_segment_mutated
   conversation_segment_conversation_chunk_mutated(event: EventEnum): conversation_segment_conversation_chunk_mutated
   conversation_segment_conversation_chunk_1_mutated(event: EventEnum): conversation_segment_conversation_chunk_1_mutated
-  conversation_segment_mutated(event: EventEnum): conversation_segment_mutated
   lightrag_vdb_transcript_mutated(event: EventEnum): lightrag_vdb_transcript_mutated
 }
 
@@ -677,6 +677,7 @@ type conversation_segment {
   transcript: String
   contextual_transcript: String
   path: String
+  lightrag_flag: Boolean
   chunks(filter: conversation_segment_conversation_chunk_1_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String): [conversation_segment_conversation_chunk_1]
   chunks_func: count_functions
 }
@@ -701,6 +702,7 @@ type conversation_segment_aggregated_count {
   transcript: Int
   contextual_transcript: Int
   path: Int
+  lightrag_flag: Int
   chunks: Int
 }
 
@@ -2178,6 +2180,7 @@ type version_conversation_segment {
   transcript: String
   contextual_transcript: String
   path: String
+  lightrag_flag: Boolean
   chunks: JSON
 }
 
@@ -2617,6 +2620,7 @@ input conversation_segment_filter {
   transcript: string_filter_operators
   contextual_transcript: string_filter_operators
   path: string_filter_operators
+  lightrag_flag: boolean_filter_operators
   chunks: conversation_segment_conversation_chunk_1_filter
   chunks_func: count_function_filter_operators
   _and: [conversation_segment_filter]
@@ -2717,6 +2721,7 @@ input create_conversation_segment_input {
   transcript: String
   contextual_transcript: String
   path: String
+  lightrag_flag: Boolean
   chunks: [create_conversation_segment_conversation_chunk_1_input]
 }
 
@@ -3743,6 +3748,7 @@ input update_conversation_segment_input {
   transcript: String
   contextual_transcript: String
   path: String
+  lightrag_flag: Boolean
   chunks: [update_conversation_segment_conversation_chunk_1_input]
 }
 

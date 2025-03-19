@@ -286,9 +286,9 @@ type Subscription {
   quote_aspect_mutated(event: EventEnum): quote_aspect_mutated
   quote_aspect_1_mutated(event: EventEnum): quote_aspect_1_mutated
   quote_conversation_chunk_mutated(event: EventEnum): quote_conversation_chunk_mutated
+  conversation_segment_mutated(event: EventEnum): conversation_segment_mutated
   conversation_segment_conversation_chunk_mutated(event: EventEnum): conversation_segment_conversation_chunk_mutated
   conversation_segment_conversation_chunk_1_mutated(event: EventEnum): conversation_segment_conversation_chunk_1_mutated
-  conversation_segment_mutated(event: EventEnum): conversation_segment_mutated
   lightrag_vdb_transcript_mutated(event: EventEnum): lightrag_vdb_transcript_mutated
 }
 
@@ -506,6 +506,7 @@ type conversation_segment {
   transcript: String
   contextual_transcript: String
   path: String
+  lightrag_flag: Boolean
   chunks(filter: conversation_segment_conversation_chunk_1_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String): [conversation_segment_conversation_chunk_1]
   chunks_func: count_functions
 }
@@ -2354,6 +2355,7 @@ input conversation_segment_filter {
   transcript: string_filter_operators
   contextual_transcript: string_filter_operators
   path: string_filter_operators
+  lightrag_flag: boolean_filter_operators
   chunks: conversation_segment_conversation_chunk_1_filter
   chunks_func: count_function_filter_operators
   _and: [conversation_segment_filter]
@@ -2448,6 +2450,7 @@ input create_conversation_segment_input {
   transcript: String
   contextual_transcript: String
   path: String
+  lightrag_flag: Boolean
   chunks: [create_conversation_segment_conversation_chunk_1_input]
 }
 
@@ -3749,6 +3752,7 @@ input update_conversation_segment_input {
   transcript: String
   contextual_transcript: String
   path: String
+  lightrag_flag: Boolean
   chunks: [update_conversation_segment_conversation_chunk_1_input]
 }
 

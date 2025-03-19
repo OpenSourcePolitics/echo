@@ -16799,6 +16799,393 @@
         ]
       }
     },
+    "/items/conversation_segment": {
+      "post": {
+        "summary": "Create an Item",
+        "description": "Create a new conversation_segment item.",
+        "tags": [
+          "Items",
+          "ItemsConversationSegment"
+        ],
+        "operationId": "createItemsConversationSegment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Meta"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ItemsConversationSegment"
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/ItemsConversationSegment"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/ItemsConversationSegment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      },
+      "get": {
+        "summary": "List Items",
+        "description": "List the conversation_segment items.",
+        "tags": [
+          "Items",
+          "ItemsConversationSegment"
+        ],
+        "operationId": "readItemsConversationSegment",
+        "security": [
+          {
+            "Auth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Fields"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/Meta"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Sort"
+          },
+          {
+            "$ref": "#/components/parameters/Filter"
+          },
+          {
+            "$ref": "#/components/parameters/Search"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "$ref": "#/components/schemas/ItemsConversationSegment"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/x-metadata"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update Multiple Items",
+        "description": "Update multiple conversation_segment items at the same time.",
+        "tags": [
+          "Items",
+          "ItemsConversationSegment"
+        ],
+        "operationId": "updateItemsConversationSegment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Fields"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "$ref": "#/components/parameters/Meta"
+          },
+          {
+            "$ref": "#/components/parameters/Offset"
+          },
+          {
+            "$ref": "#/components/parameters/Sort"
+          },
+          {
+            "$ref": "#/components/parameters/Filter"
+          },
+          {
+            "$ref": "#/components/parameters/Search"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/ItemsConversationSegment"
+                    }
+                  },
+                  {
+                    "$ref": "#/components/schemas/ItemsConversationSegment"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/ItemsConversationSegment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Multiple Items",
+        "description": "Delete multiple existing conversation_segment items.",
+        "tags": [
+          "Items",
+          "ItemsConversationSegment"
+        ],
+        "operationId": "deleteItemsConversationSegment",
+        "responses": {
+          "200": {
+            "description": "Successful request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        },
+        "parameters": []
+      }
+    },
+    "/items/conversation_segment/{id}": {
+      "get": {
+        "summary": "Retrieve an Item",
+        "description": "Retrieve a single conversation_segment item by unique identifier.",
+        "tags": [
+          "Items",
+          "ItemsConversationSegment"
+        ],
+        "operationId": "readSingleItemsConversationSegment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Fields"
+          },
+          {
+            "$ref": "#/components/parameters/Meta"
+          },
+          {
+            "$ref": "#/components/parameters/Version"
+          },
+          {
+            "name": "id",
+            "description": "Index of the item.",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "description": "Incremental index of the item.",
+                  "example": 1
+                },
+                {
+                  "type": "string",
+                  "description": "Unique identifier of the item.",
+                  "example": "8cbb43fe-4cdf-4991-8352-c461779cec02"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ItemsConversationSegment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update an Item",
+        "description": "Update an existing conversation_segment item.",
+        "tags": [
+          "Items",
+          "ItemsConversationSegment"
+        ],
+        "operationId": "updateSingleItemsConversationSegment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Fields"
+          },
+          {
+            "$ref": "#/components/parameters/Meta"
+          },
+          {
+            "name": "id",
+            "description": "Index of the item.",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "description": "Incremental index of the item.",
+                  "example": 1
+                },
+                {
+                  "type": "string",
+                  "description": "Unique identifier of the item.",
+                  "example": "8cbb43fe-4cdf-4991-8352-c461779cec02"
+                }
+              ]
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#/components/schemas/ItemsConversationSegment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/ItemsConversationSegment"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an Item",
+        "description": "Delete an existing conversation_segment item.",
+        "tags": [
+          "Items",
+          "ItemsConversationSegment"
+        ],
+        "operationId": "deleteSingleItemsConversationSegment",
+        "responses": {
+          "200": {
+            "description": "Successful request"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Index of the item.",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "description": "Incremental index of the item.",
+                  "example": 1
+                },
+                {
+                  "type": "string",
+                  "description": "Unique identifier of the item.",
+                  "example": "8cbb43fe-4cdf-4991-8352-c461779cec02"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
     "/items/conversation_segment_conversation_chunk": {
       "post": {
         "summary": "Create an Item",
@@ -17573,393 +17960,6 @@
         ]
       }
     },
-    "/items/conversation_segment": {
-      "post": {
-        "summary": "Create an Item",
-        "description": "Create a new conversation_segment item.",
-        "tags": [
-          "Items",
-          "ItemsConversationSegment"
-        ],
-        "operationId": "createItemsConversationSegment",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Meta"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/ItemsConversationSegment"
-                    }
-                  },
-                  {
-                    "$ref": "#/components/schemas/ItemsConversationSegment"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/ItemsConversationSegment"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        }
-      },
-      "get": {
-        "summary": "List Items",
-        "description": "List the conversation_segment items.",
-        "tags": [
-          "Items",
-          "ItemsConversationSegment"
-        ],
-        "operationId": "readItemsConversationSegment",
-        "security": [
-          {
-            "Auth": []
-          }
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Fields"
-          },
-          {
-            "$ref": "#/components/parameters/Limit"
-          },
-          {
-            "$ref": "#/components/parameters/Meta"
-          },
-          {
-            "$ref": "#/components/parameters/Offset"
-          },
-          {
-            "$ref": "#/components/parameters/Sort"
-          },
-          {
-            "$ref": "#/components/parameters/Filter"
-          },
-          {
-            "$ref": "#/components/parameters/Search"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "$ref": "#/components/schemas/ItemsConversationSegment"
-                      }
-                    },
-                    "meta": {
-                      "$ref": "#/components/schemas/x-metadata"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update Multiple Items",
-        "description": "Update multiple conversation_segment items at the same time.",
-        "tags": [
-          "Items",
-          "ItemsConversationSegment"
-        ],
-        "operationId": "updateItemsConversationSegment",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Fields"
-          },
-          {
-            "$ref": "#/components/parameters/Limit"
-          },
-          {
-            "$ref": "#/components/parameters/Meta"
-          },
-          {
-            "$ref": "#/components/parameters/Offset"
-          },
-          {
-            "$ref": "#/components/parameters/Sort"
-          },
-          {
-            "$ref": "#/components/parameters/Filter"
-          },
-          {
-            "$ref": "#/components/parameters/Search"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/ItemsConversationSegment"
-                    }
-                  },
-                  {
-                    "$ref": "#/components/schemas/ItemsConversationSegment"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "data": {
-                      "items": {
-                        "$ref": "#/components/schemas/ItemsConversationSegment"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete Multiple Items",
-        "description": "Delete multiple existing conversation_segment items.",
-        "tags": [
-          "Items",
-          "ItemsConversationSegment"
-        ],
-        "operationId": "deleteItemsConversationSegment",
-        "responses": {
-          "200": {
-            "description": "Successful request"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          }
-        },
-        "parameters": []
-      }
-    },
-    "/items/conversation_segment/{id}": {
-      "get": {
-        "summary": "Retrieve an Item",
-        "description": "Retrieve a single conversation_segment item by unique identifier.",
-        "tags": [
-          "Items",
-          "ItemsConversationSegment"
-        ],
-        "operationId": "readSingleItemsConversationSegment",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Fields"
-          },
-          {
-            "$ref": "#/components/parameters/Meta"
-          },
-          {
-            "$ref": "#/components/parameters/Version"
-          },
-          {
-            "name": "id",
-            "description": "Index of the item.",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "oneOf": [
-                {
-                  "type": "integer",
-                  "description": "Incremental index of the item.",
-                  "example": 1
-                },
-                {
-                  "type": "string",
-                  "description": "Unique identifier of the item.",
-                  "example": "8cbb43fe-4cdf-4991-8352-c461779cec02"
-                }
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/ItemsConversationSegment"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          }
-        }
-      },
-      "patch": {
-        "summary": "Update an Item",
-        "description": "Update an existing conversation_segment item.",
-        "tags": [
-          "Items",
-          "ItemsConversationSegment"
-        ],
-        "operationId": "updateSingleItemsConversationSegment",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/Fields"
-          },
-          {
-            "$ref": "#/components/parameters/Meta"
-          },
-          {
-            "name": "id",
-            "description": "Index of the item.",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "oneOf": [
-                {
-                  "type": "integer",
-                  "description": "Incremental index of the item.",
-                  "example": 1
-                },
-                {
-                  "type": "string",
-                  "description": "Unique identifier of the item.",
-                  "example": "8cbb43fe-4cdf-4991-8352-c461779cec02"
-                }
-              ]
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "$ref": "#/components/schemas/ItemsConversationSegment"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "data": {
-                      "type": "object",
-                      "$ref": "#/components/schemas/ItemsConversationSegment"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          }
-        }
-      },
-      "delete": {
-        "summary": "Delete an Item",
-        "description": "Delete an existing conversation_segment item.",
-        "tags": [
-          "Items",
-          "ItemsConversationSegment"
-        ],
-        "operationId": "deleteSingleItemsConversationSegment",
-        "responses": {
-          "200": {
-            "description": "Successful request"
-          },
-          "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFoundError"
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "Index of the item.",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "oneOf": [
-                {
-                  "type": "integer",
-                  "description": "Incremental index of the item.",
-                  "example": 1
-                },
-                {
-                  "type": "string",
-                  "description": "Unique identifier of the item.",
-                  "example": "8cbb43fe-4cdf-4991-8352-c461779cec02"
-                }
-              ]
-            }
-          }
-        ]
-      }
-    },
     "/items/lightrag_vdb_transcript": {
       "post": {
         "summary": "Create an Item",
@@ -18568,16 +18568,16 @@
       "x-collection": "quote_conversation_chunk"
     },
     {
+      "name": "ItemsConversationSegment",
+      "x-collection": "conversation_segment"
+    },
+    {
       "name": "ItemsConversationSegmentConversationChunk",
       "x-collection": "conversation_segment_conversation_chunk"
     },
     {
       "name": "ItemsConversationSegmentConversationChunk1",
       "x-collection": "conversation_segment_conversation_chunk_1"
-    },
-    {
-      "name": "ItemsConversationSegment",
-      "x-collection": "conversation_segment"
     },
     {
       "name": "ItemsLightragVdbTranscript",
@@ -22077,6 +22077,55 @@
         },
         "x-collection": "quote_conversation_chunk"
       },
+      "ItemsConversationSegment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "nullable": false,
+            "type": "integer"
+          },
+          "config_id": {
+            "nullable": true,
+            "type": "string"
+          },
+          "counter": {
+            "nullable": true,
+            "type": "number",
+            "format": "float"
+          },
+          "transcript": {
+            "nullable": true,
+            "type": "string"
+          },
+          "contextual_transcript": {
+            "nullable": true,
+            "type": "string"
+          },
+          "path": {
+            "nullable": true,
+            "type": "string"
+          },
+          "lightrag_flag": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "chunks": {
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "$ref": "#/components/schemas/ItemsConversationSegmentConversationChunk1"
+                }
+              ]
+            }
+          }
+        },
+        "x-collection": "conversation_segment"
+      },
       "ItemsConversationSegmentConversationChunk": {
         "type": "object",
         "properties": {
@@ -22142,51 +22191,6 @@
           }
         },
         "x-collection": "conversation_segment_conversation_chunk_1"
-      },
-      "ItemsConversationSegment": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "nullable": false,
-            "type": "integer"
-          },
-          "config_id": {
-            "nullable": true,
-            "type": "string"
-          },
-          "counter": {
-            "nullable": true,
-            "type": "number",
-            "format": "float"
-          },
-          "transcript": {
-            "nullable": true,
-            "type": "string"
-          },
-          "contextual_transcript": {
-            "nullable": true,
-            "type": "string"
-          },
-          "path": {
-            "nullable": true,
-            "type": "string"
-          },
-          "chunks": {
-            "nullable": true,
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "$ref": "#/components/schemas/ItemsConversationSegmentConversationChunk1"
-                }
-              ]
-            }
-          }
-        },
-        "x-collection": "conversation_segment"
       },
       "ItemsLightragVdbTranscript": {
         "type": "object",
