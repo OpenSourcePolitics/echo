@@ -9,6 +9,7 @@ import pytest
 
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipeline
+from dembrane.audio_lightrag.pipelines.directus_etl_pipeline import DirectusETLPipeline
 
 # @pytest.mark.usefixtures("conversation_df", "project_df")
 # def test_tracker(conversation_df: pd.DataFrame, project_df: pd.DataFrame) -> None:
@@ -58,15 +59,12 @@ from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipelin
 #     assert (process_tracker()[process_tracker().segment==-1].shape[0] == 0)
 #     assert (process_tracker()[process_tracker().segment.isna()].shape[0] == 0)
 
-@pytest.mark.usefixtures("conversation_df", "project_df")
-def test_audio_etl_pipeline_ogg(conversation_df: pd.DataFrame, 
-                                project_df: pd.DataFrame) -> None:
-    process_tracker = ProcessTracker(conversation_df=
-                                     conversation_df[conversation_df.format=='ogg'],
-                                            project_df=project_df)   
+@pytest.mark.usefixtures("test_audio_uuid")
+def test_audio_etl_pipeline_ogg(test_audio_uuid: str) -> None:
+    directus_etl_pipeline = DirectusETLPipeline()
+    process_tracker = directus_etl_pipeline.run([test_audio_uuid])
     audio_etl_pipeline = AudioETLPipeline(process_tracker)
     audio_etl_pipeline.run()
-    # process_tracker.delete_temps()
     assert (process_tracker().shape[0] != 0)
     assert (process_tracker()[process_tracker().segment==-1].shape[0] == 0)
     assert (process_tracker()[process_tracker().segment.isna()].shape[0] == 0)

@@ -1,16 +1,12 @@
-import os
-import logging
 
-# import yaml
 from dembrane.config import (
     AUDIO_LIGHTRAG_SEGMENT_DIR,
     AUDIO_LIGHTRAG_DOWNLOAD_DIR,
     AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB,
 )
+from dembrane.directus import directus
 from dembrane.audio_lightrag.utils.audio_utils import (
     process_ogg_files,
-    process_wav_files,
-    download_chunk_audio_file_as_wav,
 )
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
@@ -38,11 +34,13 @@ class AudioETLPipeline:
         self.download_root_dir = AUDIO_LIGHTRAG_DOWNLOAD_DIR
         self.segment_root_dir = AUDIO_LIGHTRAG_SEGMENT_DIR
         self.max_size_mb = AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB
+        self.configid = f'{float(self.max_size_mb):.4f}mb'
 
     def extract(self) -> None: pass
 
     def transform(self) -> None:
-        transform_process_tracker_df = self.process_tracker.get_unprocesssed_process_tracker_df('segment')
+        transform_process_tracker_df = self.process_tracker.get_unprocesssed_process_tracker_df(
+            'segment')
         zip_unique = list(
             set(
                 zip(
@@ -66,35 +64,34 @@ class AudioETLPipeline:
                 )
                 + 1
             )
+            # Create a new segment by counter every loop
+            chunk_id_2_segment = []
             while len(unprocessed_chunk_file_uri_li) != 0:
-                state_chunk_file_uri_li = unprocessed_chunk_file_uri_li
-                output_filepath = os.path.join(
-                    self.segment_root_dir, conversation_id + "_" + str(counter) + ".wav"
-                )
-                unprocessed_chunk_file_uri_li = process_ogg_files(
+                unprocessed_chunk_file_uri_li, chunk_id_2_segment_temp, counter = process_ogg_files(
                     unprocessed_chunk_file_uri_li,
-                    output_filepath,
+                    configid=self.configid,
                     max_size_mb=float(self.max_size_mb),
                     counter=counter,
-                    conversation_id=conversation_id,
                 )
-                processed_chunk_file_uri_li = [
-                    x for x in state_chunk_file_uri_li if x not in unprocessed_chunk_file_uri_li
-                ]
-                # No processed chunk file case
-                if len(processed_chunk_file_uri_li) == 0:
-                    error_file = unprocessed_chunk_file_uri_li[0]
-                    segment_dict = {error_file.split("/")[-1][37:73]: -1}
-                    unprocessed_chunk_file_uri_li = unprocessed_chunk_file_uri_li[1:]
-                    self.process_tracker.update_segment(segment_dict)
-                    logging.error(f"Error processing ogg file: {error_file}")
+                # Update the conversation_segment with the chunk_id in directus
+                [directus.update_item("conversation_segment", segment_id, item_data={"chunks": [
+                    {"conversation_chunk_id": chunk_id}
+                    ]}) for chunk_id, segment_id in chunk_id_2_segment_temp]
+
+                chunk_id_2_segment.extend(chunk_id_2_segment_temp)
+                
+            chunk_id_2_segment_dict: dict[str, list[str]] = {}
+            # Please make a dictionary of chunk_id to list of segment_id
+            for chunk_id, segment_id in chunk_id_2_segment:
+                if chunk_id not in chunk_id_2_segment_dict.keys():
+                    chunk_id_2_segment_dict[chunk_id] = [segment_id]
                 else:
-                    segment_dict = {
-                        file_path.split('/')[-1][37:73]: counter
-                        for file_path in processed_chunk_file_uri_li
-                    }  # chunk to counter
-                    self.process_tracker.update_segment(segment_dict)
-                    counter = counter + 1
+                    chunk_id_2_segment_dict[chunk_id].append(segment_id)
+            self.process_tracker.update_value_for_chunk_id(
+                chunk_id=chunk_id,
+                column_name='segment',
+                value=','.join([str(x) for x in chunk_id_2_segment_dict[chunk_id]])
+            )
 
     def load(self) -> None:
         pass

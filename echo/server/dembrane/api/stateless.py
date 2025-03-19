@@ -48,7 +48,7 @@ class InsertResponse(BaseModel):
 
 class QueryRequest(BaseModel):
     query: str
-    id: str | list[str] | None = None
+    echo_chunk_ids: str | list[str] | None = None
 
 class QueryResponse(BaseModel):
     status: str
@@ -114,8 +114,6 @@ async def insert_item(request: Request, payload: InsertRequest) -> InsertRespons
     if rag is None:
         raise HTTPException(status_code=500, detail="RAG object not initialized")
     try:
-        # Insert the content and create a default result dictionary
-        # rag.insert("TEXT1", ids=["ID_FOR_TEXT1"])
         rag.insert(payload.content, ids=[payload.id])
         await postgres_db.initdb()
         for transcript in payload.transcripts:
@@ -135,13 +133,14 @@ async def query_item(request: Request, payload: QueryRequest) -> QueryResponse:
     if rag is None:
         raise HTTPException(status_code=500, detail="RAG object not initialized")
     try:
-        result = rag.query(payload.query, param=QueryParam(mode="mix"))
-        print(f'*********{result}*********')
+        if isinstance(payload.echo_chunk_ids, str):
+            payload.echo_chunk_ids = [payload.echo_chunk_ids]
+        result = rag.query(payload.query, param=QueryParam(mode="mix", 
+                                                           ids=payload.echo_chunk_ids if payload.echo_chunk_ids else None))
         await postgres_db.initdb()
         transcripts = await fetch_query_transcript(postgres_db, 
                                             str(result), 
-                                            ids = payload.id if payload.id else None)
-        # Extract just the content from the transcripts
+                                            ids = payload.echo_chunk_ids if payload.echo_chunk_ids else None)
         transcript_contents = [t['content'] for t in transcripts] if isinstance(transcripts, list) else [transcripts['content']] # type: ignore
         return QueryResponse(status="success", result=result, transcripts=transcript_contents)
     except Exception as e:

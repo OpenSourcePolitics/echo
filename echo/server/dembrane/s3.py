@@ -39,12 +39,13 @@ Note:
     - File uploads from FastAPI have a default size limit of 100MB
     - The module automatically sanitizes file names and handles S3 key formatting
 """
-
+import io
 import logging
 from urllib.parse import urlparse
 
 import boto3  # type: ignore
 import requests
+from pydub import AudioSegment
 from fastapi import UploadFile
 from botocore.response import StreamingBody  # type: ignore
 
@@ -172,3 +173,22 @@ def get_file_size_from_s3_mb(file_name: str) -> float:
     
     # Return the size of the object in bytes
     return response['ContentLength']/(1024*1024)
+
+def save_audio_to_s3(audio: AudioSegment, file_name: str, public: bool = False) -> str:
+    """
+    Save an AudioSegment object directly to S3.
+
+    Args:
+        audio (AudioSegment): The audio segment to save.
+        file_name (str): The name of the file to save in S3.
+        public (bool): Whether the file should be publicly accessible.
+
+    Returns:
+        str: The URL of the saved file in S3.
+    """
+    audio_buffer = io.BytesIO()
+    audio.export(audio_buffer, format="wav")
+    audio_buffer.seek(0)
+    file_like = UploadFile(filename=file_name, file=audio_buffer)
+    s3_url = save_to_s3_from_file_like(file_like, file_name, public)
+    return s3_url
