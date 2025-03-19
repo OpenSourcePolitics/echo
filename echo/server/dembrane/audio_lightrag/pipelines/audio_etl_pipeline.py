@@ -80,18 +80,19 @@ class AudioETLPipeline:
 
                 chunk_id_2_segment.extend(chunk_id_2_segment_temp)
                 
-            chunk_id_2_segment_dict: dict[str, list[str]] = {}
+            chunk_id_2_segment_dict: dict[str, list[int]] = {}
             # Please make a dictionary of chunk_id to list of segment_id
             for chunk_id, segment_id in chunk_id_2_segment:
                 if chunk_id not in chunk_id_2_segment_dict.keys():
-                    chunk_id_2_segment_dict[chunk_id] = [segment_id]
+                    chunk_id_2_segment_dict[chunk_id] = [int(segment_id)]
                 else:
-                    chunk_id_2_segment_dict[chunk_id].append(segment_id)
-            self.process_tracker.update_value_for_chunk_id(
-                chunk_id=chunk_id,
-                column_name='segment',
-                value=','.join([str(x) for x in chunk_id_2_segment_dict[chunk_id]])
-            )
+                    chunk_id_2_segment_dict[chunk_id].append(int(segment_id))
+            for chunk_id, segment_id_li in chunk_id_2_segment_dict.items():
+                self.process_tracker.update_value_for_chunk_id(
+                    chunk_id=chunk_id,
+                    column_name='segment',
+                    value=','.join([str(segment_id) for segment_id in segment_id_li])
+                )
 
     def load(self) -> None:
         pass
