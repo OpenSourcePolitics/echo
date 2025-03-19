@@ -286,9 +286,10 @@ type Subscription {
   quote_aspect_mutated(event: EventEnum): quote_aspect_mutated
   quote_aspect_1_mutated(event: EventEnum): quote_aspect_1_mutated
   quote_conversation_chunk_mutated(event: EventEnum): quote_conversation_chunk_mutated
-  conversation_segment_mutated(event: EventEnum): conversation_segment_mutated
   conversation_segment_conversation_chunk_mutated(event: EventEnum): conversation_segment_conversation_chunk_mutated
   conversation_segment_conversation_chunk_1_mutated(event: EventEnum): conversation_segment_conversation_chunk_1_mutated
+  conversation_segment_mutated(event: EventEnum): conversation_segment_mutated
+  lightrag_vdb_transcript_mutated(event: EventEnum): lightrag_vdb_transcript_mutated
 }
 
 """The `Boolean` scalar type represents `true` or `false`."""
@@ -504,6 +505,7 @@ type conversation_segment {
   counter: Float
   transcript: String
   contextual_transcript: String
+  path: String
   chunks(filter: conversation_segment_conversation_chunk_1_filter, sort: [String], limit: Int, offset: Int, page: Int, search: String): [conversation_segment_conversation_chunk_1]
   chunks_func: count_functions
 }
@@ -1846,6 +1848,23 @@ type insight_mutated {
   data: insight
 }
 
+type lightrag_vdb_transcript {
+  id: ID!
+  document_id: String
+  content: String
+  content_vector: String
+  create_time: Date
+  create_time_func: datetime_functions
+  update_time: Date
+  update_time_func: datetime_functions
+}
+
+type lightrag_vdb_transcript_mutated {
+  key: ID!
+  event: EventEnum
+  data: lightrag_vdb_transcript
+}
+
 type policy_me_globals_type {
   enforce_tfa: Boolean
   app_access: Boolean
@@ -2334,6 +2353,7 @@ input conversation_segment_filter {
   counter: number_filter_operators
   transcript: string_filter_operators
   contextual_transcript: string_filter_operators
+  path: string_filter_operators
   chunks: conversation_segment_conversation_chunk_1_filter
   chunks_func: count_function_filter_operators
   _and: [conversation_segment_filter]
@@ -2427,6 +2447,7 @@ input create_conversation_segment_input {
   counter: Float
   transcript: String
   contextual_transcript: String
+  path: String
   chunks: [create_conversation_segment_conversation_chunk_1_input]
 }
 
@@ -3727,6 +3748,7 @@ input update_conversation_segment_input {
   counter: Float
   transcript: String
   contextual_transcript: String
+  path: String
   chunks: [update_conversation_segment_conversation_chunk_1_input]
 }
 

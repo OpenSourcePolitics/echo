@@ -102,4 +102,7 @@ class ProcessTracker:
                       column_name: str, status: str) -> None:
         self.df.loc[(self.df.conversation_id == conversation_id) 
                     & (self.df.chunk_id == chunk_id), column_name] = status
-        # self.save_df()
+    
+    def update_value_for_chunk_id(self, chunk_id: str, column_name: str, value: str) -> None:
+        self.df.loc[(self.df.chunk_id == chunk_id), column_name] = value
+
