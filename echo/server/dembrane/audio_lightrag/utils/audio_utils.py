@@ -14,10 +14,11 @@ def get_audio_file_size(path: str) -> float:
     return size_mb
 
 
-def wav_to_str(wav_file_path: str) -> str:
-    with open(wav_file_path, "rb") as file:
-        return base64.b64encode(file.read()).decode("utf-8")
-    
+def wav_to_str(wav_input: AudioSegment) -> str:
+    buffer = BytesIO()
+    wav_input.export(buffer, format="wav")
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
 
 def process_ogg_files(
     unprocessed_chunk_file_uri_li: list[str],

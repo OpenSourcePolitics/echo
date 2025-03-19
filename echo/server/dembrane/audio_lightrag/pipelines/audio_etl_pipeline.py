@@ -94,6 +94,7 @@ class AudioETLPipeline:
                     value=','.join([str(segment_id) for segment_id in segment_id_li])
                 )
 
+
     def load(self) -> None:
         pass
 
@@ -101,12 +102,3 @@ class AudioETLPipeline:
         self.extract()
         self.transform()
         self.load()
-
-
-# if __name__ == "__main__":
-#     import pandas as pd
-#     from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
-#     process_tracker = ProcessTracker(pd.read_csv(
-#         'server/dembrane/audio_lightrag/data/directus_etl_data/sample_conversation.csv'))
-#     pipeline = AudioETLPipeline(process_tracker)
-#     pipeline.run()

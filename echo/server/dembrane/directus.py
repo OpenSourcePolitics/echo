@@ -26,3 +26,7 @@ def create_directus_segment(configid: str, counter: float) -> str:
 
 def delete_directus_segment(segment_id: str) -> None:
     directus.delete_item("conversation_segment", segment_id)
+
+def get_conversation_by_segment(conversation_id: str, segment_id: str) -> dict:
+    response = directus.read_item("conversation", conversation_id, fields=["*"], filter={"segment": segment_id})
+    return response['data']

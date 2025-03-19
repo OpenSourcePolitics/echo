@@ -48,13 +48,5 @@ def run_etl_pipeline(conv_id_list: list[str]) -> None:
     audio_pl.run()
 
     # Run Contextual Chunk ETL
-    contextual_chunk_pl = ContextualChunkETLPipeline(process_tracker,
-                                                     audio_model_endpoint_uri = str(AZURE_OPENAI_AUDIOMODEL_ENDPOINT),
-                                                     audio_model_api_key = str(AZURE_OPENAI_AUDIOMODEL_API_KEY),
-                                                     audio_model_api_version = str(AZURE_OPENAI_AUDIOMODEL_API_VERSION),
-                                                     text_structuring_model_endpoint_uri = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_ENDPOINT),
-                                                     text_structuring_model_api_key = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_KEY),
-                                                     text_structuring_model_api_version = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_API_VERSION),
-                                                     text_structuring_model_name = str(AZURE_OPENAI_TEXTSTRUCTUREMODEL_NAME)
-                                                     )
+    contextual_chunk_pl = ContextualChunkETLPipeline(process_tracker)
     contextual_chunk_pl.run()
