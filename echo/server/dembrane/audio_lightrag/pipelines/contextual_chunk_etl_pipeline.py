@@ -1,6 +1,3 @@
-# from dotenv import load_dotenv
-
-import json
 from io import BytesIO
 from logging import getLogger
 
@@ -15,7 +12,6 @@ from dembrane.config import (
 from dembrane.directus import directus
 from dembrane.audio_lightrag.utils.prompts import Prompts
 from dembrane.audio_lightrag.utils.audio_utils import wav_to_str
-from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
 from dembrane.audio_lightrag.utils.litellm_utils import get_json_dict_from_audio
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
@@ -36,7 +32,7 @@ class ContextualChunkETLPipeline:
             segment_li = ','.join(self.process_tracker().sort_values('timestamp')[self.process_tracker()['conversation_id']  == 
                                                          conversation_id].sort_values('timestamp'
                                                                                       ).segment).split(',')
-            segment_li = [int(x) for x in list(dict.fromkeys(segment_li))] 
+            segment_li = [int(x) for x in list(dict.fromkeys(segment_li))]  # type: ignore
             project_id = self.process_tracker()[self.process_tracker()['conversation_id'] == conversation_id].project_id.unique()[0]
             event_text = '\n\n'.join([f"{k} : {v}" for k,v in self.process_tracker.get_project_df().loc[project_id].to_dict().items()])
             responses = {}
