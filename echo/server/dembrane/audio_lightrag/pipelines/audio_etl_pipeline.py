@@ -55,15 +55,7 @@ class AudioETLPipeline:
                 (transform_process_tracker_df.project_id == project_id)
                 & (transform_process_tracker_df.conversation_id == conversation_id)
             ].path.to_list()
-            counter = (
-                max(
-                    -1,
-                    self.process_tracker_df[
-                        self.process_tracker_df.conversation_id == conversation_id
-                    ].segment.max(),
-                )
-                + 1
-            )
+            counter = 0
             # Create a new segment by counter every loop
             chunk_id_2_segment = []
             while len(unprocessed_chunk_file_uri_li) != 0:

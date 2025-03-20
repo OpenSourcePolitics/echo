@@ -1,13 +1,16 @@
 import logging
 from typing import Any, Dict, List, Tuple, Optional
+from datetime import datetime
 
 import pandas as pd
 from dotenv import load_dotenv
 
+from dembrane.config import AUDIO_LIGHTRAG_TIME_THRESHOLD_SECONDS
 from dembrane.directus import directus
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
 logger = logging.getLogger("dembrane.audio_lightrag.pipelines.directus_etl_pipeline")
+
 
 class DirectusETLPipeline:
     """
@@ -60,7 +63,9 @@ class DirectusETLPipeline:
         project = self.directus.get_items("project", self.project_request)
         return conversation, project
 
-    def transform(self, conversation: List[Dict[str, Any]], project: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def transform(self, conversation: List[Dict[str, Any]], 
+                  project: List[Dict[str, Any]], 
+                  run_timestamp: str | None = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Transform the extracted data into structured pandas DataFrames.
         """
@@ -89,8 +94,15 @@ class DirectusETLPipeline:
             chunk_id = chunk['id']
             segment_ids = [segment['id'] for segment in chunk.get('conversation_segments', [])]
             chunk_to_segments[chunk_id] = segment_ids
-        chunk_to_segments = {k:','.join([str(x) for x in v]) for k,v in chunk_to_segments.items() if len(v)!=0}
+        chunk_to_segments = {k:','.join([str(x) for x in sorted(v)]) for k,v in chunk_to_segments.items() if len(v)!=0}
         conversation_df['segment'] = conversation_df.chunk_id.map(chunk_to_segments)
+        if run_timestamp is not None:
+            run_timestamp = pd.to_datetime(run_timestamp)
+            # Check diff in timestamp and remove less than 1 min
+            conversation_df['timestamp'] = pd.to_datetime(conversation_df['timestamp'])
+            # take diff between current_timestamp and timestamp
+            timestamp_diff = conversation_df['timestamp'].apply(lambda x: (run_timestamp - x).total_seconds())
+            conversation_df = conversation_df[timestamp_diff > int(AUDIO_LIGHTRAG_TIME_THRESHOLD_SECONDS)]
 
         if conversation_df.empty:
             logger.warning("No conversation data found")
@@ -107,9 +119,11 @@ class DirectusETLPipeline:
         """
         return ProcessTracker(conversation_df, project_df)
 
-    def run(self, conversation_id_list: Optional[List[str]] = None) -> ProcessTracker:
+    def run(self, 
+            conversation_id_list: Optional[List[str]] = None, 
+            run_timestamp: str | None = None ) -> ProcessTracker:
         """Run the full ETL pipeline: extract, transform, and load."""
         conversation, project = self.extract(conversation_id_list=conversation_id_list)
-        conversation_df, project_df = self.transform(conversation, project)
+        conversation_df, project_df = self.transform(conversation, project, run_timestamp)
         process_tracker = self.load_to_process_tracker(conversation_df, project_df)
         return process_tracker
