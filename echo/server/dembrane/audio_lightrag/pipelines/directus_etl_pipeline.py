@@ -1,15 +1,10 @@
 import logging
 from typing import Any, Dict, List, Tuple, Optional
 
-# import yaml
 import pandas as pd
 from dotenv import load_dotenv
-from directus_sdk_py import DirectusClient
 
-from dembrane.config import (
-    DIRECTUS_TOKEN,
-    DIRECTUS_BASE_URL,
-)
+from dembrane.directus import directus
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
 logger = logging.getLogger("dembrane.audio_lightrag.pipelines.directus_etl_pipeline")
@@ -21,10 +16,8 @@ class DirectusETLPipeline:
     def __init__(self) -> None:
         # Load environment variables from the .env file
         load_dotenv()
-
-        # Get accepted formats from config
+        self.directus = directus
         self.accepted_formats = ['wav', 'mp3', 'm4a', 'ogg']
-
         self.project_request = {"query": {"fields": 
                                                 ["id", "name", "language", "context", 
                                                 "default_conversation_title", 
@@ -41,9 +34,17 @@ class DirectusETLPipeline:
                                                     }
                                                 }
                                     }
-
-        # Initialize the Directus client using sensitive info from environment variables
-        self.directus_client = DirectusClient(DIRECTUS_BASE_URL, DIRECTUS_TOKEN)
+        self.segment_request = {"query": {
+                    "fields": 
+                        ["id", "conversation_segments.id"],
+                    "filter": {
+                        "id": {
+                            "_in": []
+                        }
+                    }
+                }
+            }
+        # Get all segment id related to a chunk id
 
     def extract(self, conversation_id_list: Optional[List[str]] = None) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """
@@ -53,59 +54,49 @@ class DirectusETLPipeline:
         # Request for conversations with their chunks
         if conversation_id_list is not None:
             self.conversation_request['query']['filter'] = {'id': {'_in': conversation_id_list}}
-        conversation = self.directus_client.get_items("conversation", self.conversation_request)
+        conversation = self.directus.get_items("conversation", self.conversation_request)
         project_id_list = list(set([conversation_request['project_id'] for conversation_request in conversation]))
         self.project_request['query']['filter'] = {'id': {'_in': project_id_list}}
-        project = self.directus_client.get_items("project", self.project_request)
+        project = self.directus.get_items("project", self.project_request)
         return conversation, project
 
     def transform(self, conversation: List[Dict[str, Any]], project: List[Dict[str, Any]]) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Transform the extracted data into structured pandas DataFrames.
         """
-        # Process conversation data
         conversation_df = pd.DataFrame(conversation)
-
-        # Filter out conversations with no chunks
         conversation_df = conversation_df[conversation_df.chunks.apply(lambda x: len(x) != 0)]
-
-        # Convert each chunk's dictionary values to a list
         conversation_df['chunks_id_path_ts'] = conversation_df.chunks.apply(
             lambda chunks: [list(chunk.values()) for chunk in chunks]
         )
-
-        # Explode the list of chunks so that each row represents one chunk
         conversation_df = conversation_df.explode('chunks_id_path_ts')
-
-        # Create separate columns for chunk_id, path, and timestamp
         conversation_df[['chunk_id', 'path', 'timestamp']] = pd.DataFrame(
             conversation_df['chunks_id_path_ts'].tolist(), index=conversation_df.index
         )
-
-        # Reset index and select only necessary columns; drop any rows with missing values
         conversation_df = conversation_df.reset_index(drop=True)
         conversation_df = conversation_df[['id', 'project_id', 'chunk_id', 'path', 'timestamp']].dropna()
-
-        # Determine the format from the file path
         conversation_df['format'] = conversation_df.path.apply(lambda x: x.split('.')[-1])
-
-        # Filter rows based on accepted formats from config
         conversation_df = conversation_df[conversation_df.format.isin(self.accepted_formats)]
-
-        # Set the conversation id as the index and sort the DataFrame
         conversation_df.rename(columns = {"id": "conversation_id"}, inplace=True)
-        # conversation_df.set_index('conversation_id', inplace=True)
         conversation_df = conversation_df.sort_values(['project_id', 'conversation_id', 'timestamp'])
-
-        # Process project data
         project_df = pd.DataFrame(project)
         project_df.set_index('id', inplace=True)
+        chunk_id_list = conversation_df.chunk_id.to_list()
+        self.segment_request['query']['filter'] = {'id': {'_in': chunk_id_list}}
+        segment = self.directus.get_items("conversation_chunk", self.segment_request)
+        chunk_to_segments = {}
+        for chunk in segment:
+            chunk_id = chunk['id']
+            segment_ids = [segment['id'] for segment in chunk.get('conversation_segments', [])]
+            chunk_to_segments[chunk_id] = segment_ids
+        chunk_to_segments = {k:','.join([str(x) for x in v]) for k,v in chunk_to_segments.items() if len(v)!=0}
+        conversation_df['segment'] = conversation_df.chunk_id.map(chunk_to_segments)
 
         if conversation_df.empty:
             logger.warning("No conversation data found")
         if project_df.empty:
             logger.warning("No project data found")
-
+        
         return conversation_df, project_df
 
     def load_to_process_tracker(self, 
