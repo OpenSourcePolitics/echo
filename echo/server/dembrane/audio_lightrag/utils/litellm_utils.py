@@ -109,7 +109,7 @@ async def llm_model_func(
     chat_completion = completion(
         model=f"azure/{AZURE_OPENAI_LIGHTRAGLLM_NAME}",  # litellm format for Azure models
         messages=messages,
-        temperature=kwargs.get("temperature", 0),
+        temperature=kwargs.get("temperature", 0.2),
         api_key=AZURE_OPENAI_LIGHTRAGLLM_API_KEY,
         api_version=AZURE_OPENAI_LIGHTRAGLLM_API_VERSION,
         api_base=AZURE_OPENAI_LIGHTRAGLLM_ENDPOINT

@@ -39,13 +39,21 @@ class ContextualChunkETLPipeline:
             for idx,segment_id in enumerate(segment_li):
                 previous_contextual_transcript_li = []
                 for previous_segment in segment_li[max(0,idx-int(self.conversation_history_num)):idx]:
-                    contextual_transcript = directus.get_item('conversation_segment', int(previous_segment))['contextual_transcript']
-                    previous_contextual_transcript_li.append(contextual_transcript)
+                    try:
+                        contextual_transcript = directus.get_item('conversation_segment', int(previous_segment))['contextual_transcript']
+                        previous_contextual_transcript_li.append(contextual_transcript)
+                    except Exception as e:
+                        logger.exception(f"Error in getting contextual transcript : {e}")
+                        continue
                 previous_contextual_transcript = '\n\n'.join(previous_contextual_transcript_li)
                 audio_model_prompt = Prompts.audio_model_system_prompt()
                 audio_model_prompt = audio_model_prompt.format(event_text = event_text, 
                                         previous_conversation_text = previous_contextual_transcript)
-                response = directus.get_item('conversation_segment', int(segment_id))
+                try: 
+                    response = directus.get_item('conversation_segment', int(segment_id))
+                except Exception as e:
+                    logger.exception(f"Error in getting conversation segment : {e}")
+                    continue
                 audio_stream = get_stream_from_s3(response['path'])
                 wav_encoding = wav_to_str(
                     AudioSegment.from_file(BytesIO(audio_stream.read()), 
@@ -60,7 +68,7 @@ class ContextualChunkETLPipeline:
                                             {'transcript': '\n\n'.join(responses[segment_id]['TRANSCRIPTS']),
                                              'contextual_transcript': responses[segment_id]['CONTEXTUAL_TRANSCRIPT']})
                     except Exception as e:
-                        logger.exception(f"Error in getting contextual transcript : {e}")
+                        logger.exception(f"Error in getting contextual transcript : {e}. Check LiteLLM API configs")
                         continue
             
                     try:
