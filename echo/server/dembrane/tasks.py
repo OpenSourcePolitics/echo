@@ -1,5 +1,4 @@
 # mypy: disable-error-code="no-untyped-def"
-import os
 from typing import List
 
 from celery import Celery, chain, chord, group, signals  # type: ignore
@@ -8,7 +7,7 @@ from celery.utils.log import get_task_logger  # type: ignore
 
 import dembrane.tasks_config
 from dembrane.utils import generate_uuid, get_utc_timestamp
-from dembrane.config import REDIS_URL
+from dembrane.config import REDIS_URL, ENABLE_AUDIO_LIGHTRAG_INPUT
 from dembrane.sentry import init_sentry
 from dembrane.database import (
     ViewModel,
@@ -764,7 +763,7 @@ def task_finish_conversation_hook(self, conversation_id: str):
                     "summary": summary,
                 },
             )
-        if os.getenv("ENABLE_AUDIO_LIGHTRAG_INPUT") and transcript_str != "":
+        if ENABLE_AUDIO_LIGHTRAG_INPUT == 1:
             run_etl_pipeline([conversation_id])
     except Exception as e:
         logger.error(f"Error: {e}")
