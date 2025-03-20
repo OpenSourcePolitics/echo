@@ -35,7 +35,7 @@ from dembrane.quote_utils import (
     cluster_quotes_using_aspect_centroids,
 )
 from dembrane.api.stateless import generate_summary
-from dembrane.audio_lightrag.main.run_etl import run_etl_pipeline as run_etl_pipeline_audio_lightrag
+from dembrane.audio_lightrag.main.run_etl import run_etl_pipeline
 
 logger = get_task_logger("celery_tasks")
 
@@ -743,11 +743,8 @@ def task_finish_conversation_hook(self, conversation_id: str):
         conversation_data = conversation_data[0]
 
         language = conversation_data["project_id"]["language"]
-        
-        
-        # TODO: Please check this try/except code logging and logic @sameer/@Usama
-        try: 
-            transcript_str = ""
+
+        transcript_str = ""
 
         for chunk in conversation_data["chunks"]:
             if chunk["transcript"] is not None:
@@ -768,12 +765,7 @@ def task_finish_conversation_hook(self, conversation_id: str):
                 },
             )
         if os.getenv("ENABLE_AUDIO_LIGHTRAG_INPUT") and transcript_str != "":
-            run_etl_pipeline_audio_lightrag([conversation_id])
-
+            run_etl_pipeline([conversation_id])
     except Exception as e:
         logger.error(f"Error: {e}")
         raise self.retry(exc=e) from e
-
-
-if __name__ == "__main__":
-    task_finish_conversation_hook.apply(["7ed3f387-eda0-4ae4-a1da-7ce0f6e1dd93"])
