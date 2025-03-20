@@ -65,10 +65,14 @@ class AudioETLPipeline:
                     max_size_mb=float(self.max_size_mb),
                     counter=counter,
                 )
+                
                 # Update the conversation_segment with the chunk_id in directus
-                [directus.update_item("conversation_segment", segment_id, item_data={"chunks": [
-                    {"conversation_chunk_id": chunk_id}
-                    ]}) for chunk_id, segment_id in chunk_id_2_segment_temp]
+                for chunk_id, segment_id in chunk_id_2_segment_temp:
+                    mapping_data = {
+                        "conversation_segment_id": segment_id,
+                        "conversation_chunk_id": chunk_id
+                    }
+                    directus.create_item("conversation_segment_conversation_chunk_1", mapping_data)
 
                 chunk_id_2_segment.extend(chunk_id_2_segment_temp)
                 

@@ -4,6 +4,7 @@ import hashlib
 import logging
 
 import numpy as np
+from litellm import embedding
 from lightrag.kg.postgres_impl import PostgreSQLDB
 
 # from lightrag.kg.postgres_impl import PostgreSQLDB
@@ -13,21 +14,22 @@ from dembrane.config import (
     AZURE_OPENAI_API_VERSION,
     AZURE_EMBEDDING_DEPLOYMENT,
 )
-from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
+
+# from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
 
 logger = logging.getLogger('audio_lightrag_utils')
 
 async def embedding_func(texts: list[str]) -> np.ndarray:
-    client = setup_azure_client(endpoint_uri = str(AZURE_EMBEDDING_ENDPOINT),
-                                      api_key = str(AZURE_EMBEDDING_API_KEY),
-                                      api_version = str(AZURE_OPENAI_API_VERSION))
+    response = embedding(
+        model=f"azure/{AZURE_EMBEDDING_DEPLOYMENT}",
+        input=texts,
+        api_key=str(AZURE_EMBEDDING_API_KEY),
+        api_base=str(AZURE_EMBEDDING_ENDPOINT),
+        api_version=str(AZURE_OPENAI_API_VERSION),
+    )
     
-    embedding = client.embeddings.create(model= str(AZURE_EMBEDDING_DEPLOYMENT), 
-                                         input=texts)
-
-    embeddings = [item.embedding for item in embedding.data]
+    embeddings = [item['embedding'] for item in response.data]
     return np.array(embeddings)
-
 
 async def check_audio_lightrag_tables(db: PostgreSQLDB) -> None:
     for _, table_definition in TABLES.items():
@@ -46,11 +48,14 @@ async def upsert_transcript(db: PostgreSQLDB,
     content_embedding = await embedding_func([content])
     content_embedding = '[' + ','.join([str(x) for x in content_embedding[0]]) + ']' # type: ignore
 
-    sql = SQL_TEMPLATES["UPSERT_TRANSCRIPT"].format(id=id, 
-                                                    document_id=document_id, 
-                                                    content=content, 
-                                                    content_vector=content_embedding)
-    await db.execute(sql)
+    sql = SQL_TEMPLATES["UPSERT_TRANSCRIPT"]
+    data = {
+        "id": id,
+        "document_id": document_id,
+        "content": content,
+        "content_vector": content_embedding
+    }
+    await db.execute(sql = sql, data=data)
 
 async def fetch_query_transcript(db: PostgreSQLDB, 
                            query: str,
@@ -74,7 +79,7 @@ TABLES = {
     CREATE TABLE IF NOT EXISTS LIGHTRAG_VDB_TRANSCRIPT (
     id VARCHAR(255),
     document_id VARCHAR(255),
-    content VARCHAR(255),
+    content TEXT,
     content_vector VECTOR,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP,
@@ -87,11 +92,11 @@ SQL_TEMPLATES = {
     "UPSERT_TRANSCRIPT": 
     """
         INSERT INTO LIGHTRAG_VDB_TRANSCRIPT (id, document_id, content, content_vector)
-        VALUES ('{id}', '{document_id}', '{content}', '{content_vector}')
+        VALUES ($1, $2, $3, $4)
         ON CONFLICT (id) DO UPDATE SET
-        document_id = '{document_id}',
-        content = '{content}',
-        content_vector = '{content_vector}'
+        document_id = $2,
+        content = $3,
+        content_vector = $4
     """, 
     "QUERY_TRANSCRIPT": 
     """
@@ -112,5 +117,10 @@ SQL_TEMPLATES = {
     """
 }
 
-
+if __name__ == "__main__":
+    # test the embedding function
+    import asyncio
+    texts = ["Hello, world!", "This is a test."]
+    embeddings = asyncio.run(embedding_func(texts))
+    print(embeddings)
 

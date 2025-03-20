@@ -55,12 +55,12 @@ class ContextualChunkETLPipeline:
                     logger.exception(f"Error in getting conversation segment : {e}")
                     continue
                 audio_stream = get_stream_from_s3(response['path'])
-                wav_encoding = wav_to_str(
-                    AudioSegment.from_file(BytesIO(audio_stream.read()), 
-                                           format="wav")
-                                           )
                 if response['contextual_transcript'] is None:
                     try:  
+                        wav_encoding = wav_to_str(
+                            AudioSegment.from_file(BytesIO(audio_stream.read()), 
+                                                format="wav")
+                                                )
                         responses[segment_id] = get_json_dict_from_audio(wav_encoding = wav_encoding,
                                                                          audio_model_prompt=audio_model_prompt,
                                                                         )
@@ -70,7 +70,10 @@ class ContextualChunkETLPipeline:
                     except Exception as e:
                         logger.exception(f"Error in getting contextual transcript : {e}. Check LiteLLM API configs")
                         continue
-            
+                else:
+                    responses[segment_id] = {'CONTEXTUAL_TRANSCRIPT': response['contextual_transcript'],
+                                             'TRANSCRIPTS': response['transcript'].split('\n\n')}
+                if response['lightrag_flag'] is False:
                     try:
                         response = requests.post(
                             f"{self.api_base_url}/api/stateless/rag/insert",
@@ -79,8 +82,9 @@ class ContextualChunkETLPipeline:
                                     "transcripts": responses[segment_id]['TRANSCRIPTS']}
                         )
                         # lightrag_flag is a boolean field in the conversation_segment table
-                        directus.update_item('conversation_segment', int(segment_id), 
-                                            {'lightrag_flag': True})
+                        if response.status_code == 200:
+                            directus.update_item('conversation_segment', int(segment_id), 
+                                                {'lightrag_flag': True})
                         if response.status_code != 200:
                             logger.info(f"Error in inserting transcript into LightRAG for segment {segment_id}. Check API health : {response.status_code}")
                             

@@ -44,6 +44,7 @@ def process_ogg_files(
     chunk_id = list(chunk_size_dict.keys())[0]
     chunk_id_2_segment = []
     segment_2_path = {}
+    # One chunk to many segments
     if chunk_size_dict[chunk_id] > max_size_mb:
         n_sub_chunks = int((chunk_size_dict[chunk_id] // max_size_mb) + 1)
         audio_stream = get_stream_from_s3(chunk_id_2_uri[chunk_id])
@@ -64,6 +65,7 @@ def process_ogg_files(
             segment_2_path[segment_id] = segment_uri
             counter += 1
         return unprocessed_chunk_file_uri_li[1:], chunk_id_2_segment, counter
+    #Many chunks to one segment
     else:
         processed_chunk_li = []
         combined_size = 0
