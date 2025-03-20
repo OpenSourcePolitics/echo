@@ -16,7 +16,6 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware import Middleware
 from fastapi.openapi.utils import get_openapi
 from lightrag.kg.postgres_impl import PostgreSQLDB
-from lightrag.llm.azure_openai import azure_openai_complete
 from starlette.middleware.cors import CORSMiddleware
 from lightrag.kg.shared_storage import initialize_pipeline_status
 
@@ -27,6 +26,9 @@ from dembrane.config import (
 )
 from dembrane.sentry import init_sentry
 from dembrane.api.api import api
+
+# from lightrag.llm.azure_openai import azure_openai_complete
+from dembrane.audio_lightrag.utils.litellm_utils import llm_model_func
 from dembrane.audio_lightrag.utils.lightrag_utils import embedding_func, check_audio_lightrag_tables
 
 nest_asyncio.apply()
@@ -46,7 +48,6 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
         "user": os.environ["POSTGRES_USER"],
         "password": os.environ["POSTGRES_PASSWORD"],
         "database": os.environ["POSTGRES_DATABASE"],
-        # "workspace": os.environ["POSTGRES_WORKSPACE"]
     }
 
     postgres_db = PostgreSQLDB(config=postgres_config)
@@ -60,7 +61,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
 
     _app.state.rag = LightRAG(
         working_dir=working_dir,
-        llm_model_func=azure_openai_complete,
+        llm_model_func=llm_model_func,
         embedding_func=embedding_func,
         kv_storage="PGKVStorage",
         doc_status_storage="PGDocStatusStorage",

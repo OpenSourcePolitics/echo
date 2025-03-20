@@ -16,7 +16,7 @@ from dembrane.directus import directus
 from dembrane.audio_lightrag.utils.prompts import Prompts
 from dembrane.audio_lightrag.utils.audio_utils import wav_to_str
 from dembrane.audio_lightrag.utils.azure_utils import setup_azure_client
-from dembrane.audio_lightrag.utils.open_ai_utils import get_json_dict_from_audio
+from dembrane.audio_lightrag.utils.litellm_utils import get_json_dict_from_audio
 from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 
 logger = getLogger("audio_lightrag.pipelines.contextual_chunk_etl_pipeline")
@@ -61,7 +61,8 @@ class ContextualChunkETLPipeline:
                                                                          audio_model_prompt=audio_model_prompt,
                                                                         )
                         directus.update_item('conversation_segment', int(segment_id), 
-                                            {'contextual_transcript': '\n\n'.join(responses[segment_id]['TRANSCRIPTS'])})
+                                            {'transcript': '\n\n'.join(responses[segment_id]['TRANSCRIPTS']),
+                                             'contextual_transcript': responses[segment_id]['CONTEXTUAL_TRANSCRIPT']})
                     except Exception as e:
                         logger.exception(f"Error in getting contextual transcript : {e}")
                         continue

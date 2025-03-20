@@ -8,7 +8,7 @@ from dembrane.audio_lightrag.pipelines.contextual_chunk_etl_pipeline import (
 
 
 @pytest.mark.usefixtures("test_audio_uuid")
-def test_Contextual_chunk_etl_pipeline(test_audio_uuid: str) -> None:
+def test_contextual_chunk_etl_pipeline(test_audio_uuid: str) -> None:
     directus_etl_pipeline = DirectusETLPipeline()
     process_tracker = directus_etl_pipeline.run([test_audio_uuid])
     audio_etl_pipeline = AudioETLPipeline(process_tracker)
