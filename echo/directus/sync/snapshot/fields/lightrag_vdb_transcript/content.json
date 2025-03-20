@@ -1,14 +1,14 @@
 {
   "collection": "lightrag_vdb_transcript",
   "field": "content",
-  "type": "string",
+  "type": "text",
   "meta": null,
   "schema": {
     "name": "content",
     "table": "lightrag_vdb_transcript",
-    "data_type": "character varying",
+    "data_type": "text",
     "default_value": null,
-    "max_length": 255,
+    "max_length": null,
     "numeric_precision": null,
     "numeric_scale": null,
     "is_nullable": true,

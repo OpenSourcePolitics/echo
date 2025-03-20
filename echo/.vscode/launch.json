@@ -24,6 +24,18 @@
       },
       "console": "integratedTerminal",
       "justMyCode": "false"
+    },
+    {
+      "name": "Python: LightRAG Embedding Debug",
+      "type": "python",
+      "request": "launch",
+      "program": "dembrane/audio_lightrag/utils/lightrag_utils.py",
+      "cwd": "${workspaceFolder}/server",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/server"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": "false"
     }
   ]
 }
