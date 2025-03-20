@@ -20,6 +20,7 @@ from starlette.middleware.cors import CORSMiddleware
 from lightrag.kg.shared_storage import initialize_pipeline_status
 
 from dembrane.config import (
+    DISABLE_CORS,
     ADMIN_BASE_URL,
     SERVE_API_DOCS,
     PARTICIPANT_BASE_URL,
@@ -86,11 +87,8 @@ if SERVE_API_DOCS:
     logger.info("serving api docs at /docs")
     docs_url = "/docs"
 
-# need to be added at the end
-origins = [
-    ADMIN_BASE_URL,
-    PARTICIPANT_BASE_URL,
-]
+# cors: protected by default, use DISABLE_CORS to disable
+origins = "*" if DISABLE_CORS else [ADMIN_BASE_URL, PARTICIPANT_BASE_URL]
 
 logger.info(f"CORS origins: {origins}")
 

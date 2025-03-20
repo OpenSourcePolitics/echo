@@ -64,7 +64,7 @@ We offer several ways to get started:
 ## Documentation
 
 - [User Guide / Documentation](https://docs.dembrane.com) (built from `echo-user-docs` folder)
-- [Developer Documentation](echo/README.md) 
+- [Developer Documentation](echo/readme.md) 
 
 ## For Those Considering a Fork
 
@@ -99,3 +99,5 @@ Thanks to everyone in the community that has contributed to this project!
 <a href="https://github.com/dembrane/echo/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=dembrane/echo" />
 </a>
+
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Dembrane/echo?utm_source=oss&utm_medium=github&utm_campaign=Dembrane%2Fecho&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
