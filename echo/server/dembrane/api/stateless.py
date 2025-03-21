@@ -48,7 +48,8 @@ class InsertResponse(BaseModel):
 
 class QueryRequest(BaseModel):
     query: str
-    echo_chunk_ids: str | list[str] | None = None
+    echo_segment_ids: str | list[str] | None = None
+    get_transcripts: bool = False
 
 class QueryResponse(BaseModel):
     status: str
@@ -133,16 +134,24 @@ async def query_item(request: Request, payload: QueryRequest) -> QueryResponse:
     if rag is None:
         raise HTTPException(status_code=500, detail="RAG object not initialized")
     try:
-        if isinstance(payload.echo_chunk_ids, str):
-            payload.echo_chunk_ids = [payload.echo_chunk_ids]
+        print(payload.echo_segment_ids)
+        if isinstance(payload.echo_segment_ids, str):
+            payload.echo_segment_ids = [payload.echo_segment_ids]
         result = rag.query(payload.query, param=QueryParam(mode="mix", 
-                                                           ids=payload.echo_chunk_ids if payload.echo_chunk_ids else None))
-        await postgres_db.initdb()
-        transcripts = await fetch_query_transcript(postgres_db, 
+                                                           ids=payload.echo_segment_ids if payload.echo_segment_ids else None))
+        print(result)
+        if payload.get_transcripts:
+            await postgres_db.initdb()
+            transcripts = await fetch_query_transcript(postgres_db, 
                                             str(result), 
-                                            ids = payload.echo_chunk_ids if payload.echo_chunk_ids else None)
-        transcript_contents = [t['content'] for t in transcripts] if isinstance(transcripts, list) else [transcripts['content']] # type: ignore
+                                            ids = payload.echo_segment_ids if payload.echo_segment_ids else None)
+            transcript_contents = [t['content'] for t in transcripts] if isinstance(transcripts, list) \
+                else [transcripts['content']] # type: ignore
+        else:
+            transcript_contents = []
         return QueryResponse(status="success", result=result, transcripts=transcript_contents)
     except Exception as e:
         logger.exception("Query operation failed")
         raise HTTPException(status_code=500, detail=str(e)) from e
+    
+    

@@ -280,6 +280,10 @@ logger.debug("STORAGE_S3_SECRET: set")
 DISABLE_CORS = os.environ.get("DISABLE_CORS", "false").lower() in ["true", "1"]
 logger.debug(f"DISABLE_CORS: {DISABLE_CORS}")
 
+ENABLE_AUDIO_LIGHTRAG_INPUT = os.environ.get("ENABLE_AUDIO_LIGHTRAG_INPUT") 
+assert ENABLE_AUDIO_LIGHTRAG_INPUT, "ENABLE_AUDIO_LIGHTRAG_INPUT environment variable is not set"
+logger.debug(f"ENABLE_AUDIO_LIGHTRAG_INPUT: {ENABLE_AUDIO_LIGHTRAG_INPUT}")
+
 # hide some noisy loggers
 for hide_logger in [
     "boto3",
