@@ -63,14 +63,17 @@ async def fetch_query_transcript(db: PostgreSQLDB,
                            limit: int = 10) -> list[str] | None:
     if ids is None:
         ids = 'NULL'
+        filter = 'NULL'
     else:
         ids = ','.join(["'" + str(id) + "'" for id in ids])
+        filter = '1'
     
     
+    await db.initdb()
     query_embedding = await embedding_func([query])
     query_embedding = ','.join([str(x) for x in query_embedding[0]]) # type: ignore
     sql = SQL_TEMPLATES["QUERY_TRANSCRIPT"].format(
-        embedding_string=query_embedding, limit=limit, doc_ids=ids)
+        embedding_string=query_embedding, limit=limit, doc_ids=ids, filter=filter)
     result = await db.query(sql, multirows=True)
     return result
 
@@ -103,7 +106,7 @@ SQL_TEMPLATES = {
         WITH relevant_chunks AS (
             SELECT id as chunk_id
             FROM LIGHTRAG_VDB_TRANSCRIPT
-            WHERE {doc_ids} IS NULL OR document_id = ANY(ARRAY[{doc_ids}])
+            WHERE {filter} IS NULL OR document_id = ANY(ARRAY[{doc_ids}])
         )
         SELECT content FROM
             (
@@ -118,9 +121,26 @@ SQL_TEMPLATES = {
 }
 
 if __name__ == "__main__":
-    # test the embedding function
+    # # test the embedding function
+    import os
     import asyncio
-    texts = ["Hello, world!", "This is a test."]
-    embeddings = asyncio.run(embedding_func(texts))
-    print(embeddings)
+    # texts = ["Hello, world!", "This is a test."]
+    # embeddings = asyncio.run(embedding_func(texts))
+    # print(embeddings)
 
+
+
+    postgres_config = {
+        "host": os.environ["POSTGRES_HOST"],
+        "port": os.environ["POSTGRES_PORT"],
+        "user": os.environ["POSTGRES_USER"],
+        "password": os.environ["POSTGRES_PASSWORD"],
+        "database": os.environ["POSTGRES_DATABASE"],
+    }
+
+    # test the upsert transcript function
+    db = PostgreSQLDB(config=postgres_config)
+    
+    asyncio.run(fetch_query_transcript(db, "Hello, world!", ids=["test-document-129", 
+                                                                 "test-document-129", 
+                                                                 "test-document-123"]))
