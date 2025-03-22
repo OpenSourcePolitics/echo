@@ -4,10 +4,9 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
-import pandas as pd
+
 import pytest
 
-from dembrane.audio_lightrag.utils.process_tracker import ProcessTracker
 from dembrane.audio_lightrag.pipelines.audio_etl_pipeline import AudioETLPipeline
 from dembrane.audio_lightrag.pipelines.directus_etl_pipeline import DirectusETLPipeline
 

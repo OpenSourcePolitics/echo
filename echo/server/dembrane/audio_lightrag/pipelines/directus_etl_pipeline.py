@@ -1,6 +1,5 @@
 import logging
 from typing import Any, Dict, List, Tuple, Optional
-from datetime import datetime
 
 import pandas as pd
 from dotenv import load_dotenv

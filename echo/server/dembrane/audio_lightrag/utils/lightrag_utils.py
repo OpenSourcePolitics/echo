@@ -69,7 +69,7 @@ async def fetch_query_transcript(db: PostgreSQLDB,
         filter = '1'
     
     
-    await db.initdb()
+    # await db.initdb() # Need to test if this is needed
     query_embedding = await embedding_func([query])
     query_embedding = ','.join([str(x) for x in query_embedding[0]]) # type: ignore
     sql = SQL_TEMPLATES["QUERY_TRANSCRIPT"].format(
