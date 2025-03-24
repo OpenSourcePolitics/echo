@@ -10,7 +10,9 @@
 #   universal: false
 
 aiofiles==23.2.1
-aiohttp==3.9.5
+aiohappyeyeballs==2.6.1
+    # via aiohttp
+aiohttp==3.11.14
     # via langchain
     # via langchain-community
     # via litellm
@@ -67,7 +69,7 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
-configparser==7.1.0
+configparser==7.2.0
 cryptography==42.0.8
     # via python-jose
 dataclasses-json==0.6.6
@@ -197,13 +199,16 @@ packaging==23.2
 pandas==2.2.2
 pandas-stubs==2.2.2.240514
 pgvector==0.2.5
-pipmaster==0.4.0
+pipmaster==0.5.1
 pluggy==1.5.0
     # via pytest
 prometheus-client==0.20.0
     # via flower
 prompt-toolkit==3.0.43
     # via click-repl
+propcache==0.3.0
+    # via aiohttp
+    # via yarl
 psycopg==3.1.19
 psycopg-binary==3.1.19
     # via psycopg
@@ -297,7 +302,7 @@ tenacity==8.3.0
     # via langchain-core
 threadpoolctl==3.5.0
     # via scikit-learn
-tiktoken==0.7.0
+tiktoken==0.9.0
     # via langchain-openai
     # via litellm
 tokenizers==0.21.0
@@ -353,7 +358,7 @@ wcwidth==0.2.13
     # via prompt-toolkit
 websockets==12.0
     # via uvicorn
-yarl==1.9.4
+yarl==1.18.3
     # via aiohttp
 zipp==3.21.0
     # via importlib-metadata
