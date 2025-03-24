@@ -5,7 +5,7 @@ from io import BytesIO
 from pydub import AudioSegment
 
 from dembrane.s3 import save_audio_to_s3, get_stream_from_s3, get_file_size_from_s3_mb
-from dembrane.directus import directus, create_directus_segment
+from dembrane.directus import directus
 
 
 def get_audio_file_size(path: str) -> float:
@@ -91,3 +91,22 @@ def process_ogg_files(
 def ogg_to_str(ogg_file_path: str) -> str:
     with open(ogg_file_path, "rb") as file:
         return base64.b64encode(file.read()).decode("utf-8")
+    
+
+def create_directus_segment(configid: str, counter: float) -> str:
+    response = directus.create_item(
+            "conversation_segment",
+            item_data={
+                "config_id": configid,
+                "counter": counter,
+            },
+        )
+    directus_id = response['data']['id']
+    return directus_id
+
+def delete_directus_segment(segment_id: str) -> None:
+    directus.delete_item("conversation_segment", segment_id)
+
+def get_conversation_by_segment(conversation_id: str, segment_id: str) -> dict:
+    response = directus.read_item("conversation", conversation_id, fields=["*"], filter={"segment": segment_id})
+    return response['data']
