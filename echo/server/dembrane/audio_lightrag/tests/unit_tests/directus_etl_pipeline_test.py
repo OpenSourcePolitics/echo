@@ -2,11 +2,6 @@ import unittest
 
 import pytest
 
-# from dembrane.config import (
-#     BASE_DIR,
-#     AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH,
-#     AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH,
-# )
 from dembrane.audio_lightrag.pipelines.directus_etl_pipeline import DirectusETLPipeline
 
 

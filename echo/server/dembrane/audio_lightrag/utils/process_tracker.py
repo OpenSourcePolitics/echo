@@ -3,18 +3,11 @@ import shutil
 
 import pandas as pd
 
-from dembrane.config import (
-    AUDIO_LIGHTRAG_SEGMENT_DIR,
-    AUDIO_LIGHTRAG_DOWNLOAD_DIR,
-    AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH,
-)
-
 
 class ProcessTracker:
     def __init__(self, 
                  conversation_df: pd.DataFrame, 
                  project_df: pd.DataFrame,
-                 process_tracker_df_path: str = AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH,
                  ) -> None:
         """
         Initialize the ProcessTracker.
@@ -23,7 +16,6 @@ class ProcessTracker:
         - df (pd.DataFrame): DataFrame containing the information to be tracked.
         - df_path (str): Path to save the DataFrame.
         """
-        self.process_tracker_df_path = process_tracker_df_path
         self.df = conversation_df
         self.project_df = project_df
         # Ensure the columns are present
@@ -34,8 +26,6 @@ class ProcessTracker:
         if 'ligtrag_status' not in conversation_df.columns:
             self.df['ligtrag_status'] = None
         self.project_df = project_df
-        self.temp_dir_lis = [str(AUDIO_LIGHTRAG_DOWNLOAD_DIR), 
-                             str(AUDIO_LIGHTRAG_SEGMENT_DIR)]
 
 
     def __call__(self) -> pd.DataFrame:

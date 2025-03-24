@@ -229,28 +229,12 @@ AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB = os.environ.get("AUDIO_LIGHTRAG_MAX_AUDIO
 assert AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB, "AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_MAX_AUDIO_FILE_SIZE_MB: set")
 
-AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH = os.environ.get("AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH", AUDIO_LIGHTRAG_DATA_DIR)
-assert AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH, "AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH environment variable is not set"
-logger.debug("AUDIO_LIGHTRAG_OUTPUT_JSON_FILEPATH: set")
 
 #conversation_history_num
 AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM = os.environ.get("AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM", 10)
 assert AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM, "AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM environment variable is not set"
 logger.debug("AUDIO_LIGHTRAG_CONVERSATION_HISTORY_NUM: set")
 
-# conversation_output_path: "server/dembrane/audio_lightrag/data/directus_etl_data/conversation.csv"
-# project_output_path: "server/dembrane/audio_lightrag/data/directus_etl_data/project.csv"
-AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/conversation.csv"))
-assert AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH, "AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH environment variable is not set"
-logger.debug("AUDIO_LIGHTRAG_CONVERSATION_OUTPUT_PATH: set")
-
-AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/project.csv"))
-assert AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH, "AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH environment variable is not set"
-logger.debug("AUDIO_LIGHTRAG_PROJECT_OUTPUT_PATH: set")
-
-AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH = os.environ.get("AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH", os.path.join(BASE_DIR, "dembrane/audio_lightrag/data/process_tracker.csv"))
-assert AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH, "AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH environment variable is not set"
-logger.debug("AUDIO_LIGHTRAG_PROCESS_TRACKER_OUTPUT_PATH: set")
 
 AUDIO_LIGHTRAG_TIME_THRESHOLD_SECONDS = os.environ.get("AUDIO_LIGHTRAG_TIME_THRESHOLD_SECONDS", 60)
 assert AUDIO_LIGHTRAG_TIME_THRESHOLD_SECONDS, "AUDIO_LIGHTRAG_TIME_THRESHOLD_SECONDS environment variable is not set"
