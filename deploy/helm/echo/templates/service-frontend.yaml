@@ -1,0 +1,19 @@
+{{ if .Values.frontend.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  name: {{ .Release.Name }}-frontend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: echo
+    component: frontend
+spec:
+  type: {{ .Values.frontend.service.type }}
+  ports:
+    - port: {{ .Values.frontend.service.port }}
+  selector:
+    app: echo
+    component: frontend
+{{ end }}

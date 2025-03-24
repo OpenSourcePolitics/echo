@@ -1,0 +1,233 @@
+_shared_config:
+  directusHost: &directusHost directus.echo.CHANGE_ME.COM
+  apiHost: &apiHost api.echo.CHANGE_ME.COM
+  frontendHost: &frontendHost echo.CHANGE_ME.COM
+  adminHost: &adminHost dashboard.echo.CHANGE_ME.COM
+  participantHost: &participantHost portal.echo.CHANGE_ME.COM
+  apiUrl: &apiUrl https://api.echo.CHANGE_ME.COM
+  frontendUrl: &frontendUrl https://echo.CHANGE_ME.COM
+  directusPublicUrl: &directusPublicUrl https://directus.echo.CHANGE_ME.COM
+  dashboardPublicUrl: &adminBaseUrl https://dashboard.echo.CHANGE_ME.COM
+  participantBaseUrl: &participantBaseUrl https://portal.echo.CHANGE_ME.COM
+  redisUrl: &redisUrl "redis://echo-redis:6379"
+  database:
+    databaseUsername: &databaseUsername "CHANGE_ME"
+    databasePassword: &databasePassword "CHANGE_ME_PASSWORD"
+    databaseName: &databaseName "echo"
+    databaseUrl: &databaseUrl "postgresql://CHANGE_ME:CHANGE_ME_PASSWORD@CHANGE_ME:5432/echo"
+    databaseUrlPsycoPg: &databaseUrlPsycoPg "postgresql+psycopg://CHANGE_ME:CHANGE_ME_PASSWORD@CHANGE_ME:5432/echo"
+  rabbitmq:
+    rabbitmqUsername: &rabbitmqUsername "CHANGE_ME"
+    rabbitmqPassword: &rabbitmqPassword "CHANGE_ME_PASSWORD"
+    rabbitmqUrl: &rabbitmqUrl "amqp://CHANGE_ME:CHANGE_ME_PASSWORD@echo-rabbitmq:5672"
+  directus:
+    auth:
+      googleClientId: &googleClientId "a"
+      googleClientSecret: &googleClientSecret "a"
+    directusAdminEmail: &directusAdminEmail ""
+    directusAdminPassword: &directusAdminPassword ""
+    directusAdminToken: &directusAdminToken ""
+    directusEmailFrom: &directusEmailFrom ""
+    directusEmailSmtpHost: &directusEmailSmtpHost ""
+    directusEmailSmtpUser: &directusEmailSmtpUser ""
+    directusEmailSmtpPassword: &directusEmailSmtpPassword ""
+    directusEmailSmtpPort: &directusEmailSmtpPort ""
+    directusSecret: &directusSecret ""
+  apiServer:
+    buildVersion: "1.0.0"
+    openaiApiKey: &openaiApiKey "CHANGE_ME"
+    anthropicApiKey: &anthropicApiKey "CHANGE_ME"
+
+global:
+  imageTag: "1.0.0"
+  registry: "rg.fr-par.scw.cloud/dembrane"
+  dbConnectionString: ""
+  redisUrl: *redisUrl
+
+apiServer:
+  replicaCount: 1
+  image:
+    repository: "rg.fr-par.scw.cloud/dembrane/dbr-server"
+    tag: "1.0.0"
+  service:
+    port: 8000
+  env:
+    DIRECTUS_PUBLIC_URL: *directusPublicUrl
+    ADMIN_BASE_URL: *adminBaseUrl
+    PARTICIPANT_BASE_URL: *participantBaseUrl
+    BUILD_VERSION: "1.0.0"
+    DISABLE_REDACTION: "1"
+    DISABLE_SENTRY: "0"
+    SERVE_API_DOCS: "1"
+    ANTHROPIC_API_KEY: *anthropicApiKey
+    DATABASE_URL: *databaseUrl
+    DATABASE_URL_WORKER: *databaseUrlPsycoPg
+    OPENAI_API_KEY: *openaiApiKey
+    REDIS_URL: *redisUrl
+    RABBITMQ_URL: *rabbitmqUrl
+
+directus:
+  replicaCount: 2
+  image:
+    repository: "rg.fr-par.scw.cloud/dembrane/dbr-echo-directus"
+    tag: "1.0.0"
+  service:
+    port: 8055
+  env:
+    SESSION_COOKIE_NAME: "dembrane_session_token_prod"
+    PUBLIC_URL: *directusPublicUrl
+    PORT: "8055"
+    WEBSOCKETS_ENABLED: "true"
+    DB_CLIENT: "pg"
+    DB_DATABASE: *databaseName
+    TELEMETRY: "false"
+    REDIS_ENABLED: "true"
+    CORS_ENABLED: "true"
+    CORS_CREDENTIALS: "true"
+    SESSION_COOKIE_SAME_SITE: "lax"
+    SESSION_COOKIE_SECURE: "lax"
+    EMAIL_TRANSPORT: "smtp"
+    AUTH_GOOGLE_CLIENT_ID: *googleClientId
+    AUTH_GOOGLE_CLIENT_SECRET: *googleClientSecret
+    ADMIN_EMAIL: *directusAdminEmail
+    DIRECTUS_ADMIN_PASSWORD: *directusAdminPassword
+    DIRECTUS_ADMIN_TOKEN: *directusAdminToken
+    DIRECTUS_EMAIL_FROM: *directusEmailFrom
+    DIRECTUS_EMAIL_SMTP_HOST: *directusEmailSmtpHost
+    DIRECTUS_EMAIL_SMTP_USER: *directusEmailSmtpUser
+    DIRECTUS_EMAIL_SMTP_PASSWORD: *directusEmailSmtpPassword
+    DIRECTUS_EMAIL_SMTP_PORT: *directusEmailSmtpPort
+    DIRECTUS_SECRET: *directusSecret
+
+worker:
+  replicaCount: 1
+  image:
+    repository: "rg.fr-par.scw.cloud/dembrane/dbr-server"
+    tag: "1.0.0"
+  env:
+    DIRECTUS_PUBLIC_URL: *directusPublicUrl
+    ADMIN_BASE_URL: *adminBaseUrl
+    PARTICIPANT_BASE_URL: *participantBaseUrl
+    BUILD_VERSION: "1.0.0"
+    DISABLE_REDACTION: "1"
+    DISABLE_SENTRY: "0"
+    SERVE_API_DOCS: "0"
+
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    directus: *directusHost
+    api: *apiHost
+    frontend: *frontendHost
+    dashboard: *adminHost
+    participant: *participantHost
+  tls:
+    - secretName: "echo-tls"
+      hosts:
+        - *directusHost
+        - *apiHost
+        - *frontendHost
+        - *adminHost
+        - *participantHost
+
+postgresql:
+  enabled: false
+  image:
+    repository: pgvector/pgvector
+    tag: "pg16"
+  postgresqlUsername: *databaseUsername
+  postgresqlPassword: *databasePassword
+  postgresqlDatabase: *databaseName
+  service:
+    type: ClusterIP
+    port: 5432
+  persistence:
+    enabled: true
+    size: 3Gi
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7"
+  service:
+    type: ClusterIP
+    port: 6379
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+
+rabbitmq:
+  enabled: true
+  image:
+    repository: rabbitmq
+    tag: "3.11-management"
+  service:
+    type: ClusterIP
+    port: 5672
+    managementPort: 15672
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 500m
+  username: *rabbitmqUsername
+  password: *rabbitmqPassword
+
+frontend:
+  enabled: true
+  image:
+    repository: "rg.fr-par.scw.cloud/dembrane/dbr-frontend"
+    tag: "1.0.0"
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 5173
+  env:
+    VITE_BUILD_VERSION: "1.0.0"
+    VITE_API_BASE_URL: *apiUrl
+    VITE_ADMIN_BASE_URL: *adminBaseUrl
+    VITE_PARTICIPANT_BASE_URL: *participantBaseUrl
+    VITE_USE_PARTICIPANT_ROUTER: "0"
+    VITE_DIRECTUS_PUBLIC_URL: *directusPublicUrl
+    VITE_DIRECTUS_CONTENT_PUBLIC_URL: *directusPublicUrl
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m
+
+participant:
+  enabled: true
+  image:
+    repository: "rg.fr-par.scw.cloud/dembrane/dbr-frontend"
+    tag: "1.0.0"
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 5173
+  env:
+    VITE_USE_PARTICIPANT_ROUTER: "1"
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m

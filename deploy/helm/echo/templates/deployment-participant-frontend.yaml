@@ -1,0 +1,49 @@
+{{ if .Values.participant.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-participant-frontend
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: echo
+    component: participant
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: echo
+      component: participant
+  template:
+    metadata:
+      labels:
+        app: echo
+        component: participant
+    spec:
+      containers:
+        - name: frontend
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          ports:
+            - containerPort: 5173
+          env:
+            - name: VITE_BUILD_VERSION
+              value: "{{ .Values.frontend.env.VITE_BUILD_VERSION }}"
+            - name: VITE_API_BASE_URL
+              value: "{{ .Values.frontend.env.VITE_API_BASE_URL }}"
+            - name: VITE_ADMIN_BASE_URL
+              value: "{{ .Values.frontend.env.VITE_ADMIN_BASE_URL }}"
+            - name: VITE_PARTICIPANT_BASE_URL
+              value: "{{ .Values.frontend.env.VITE_PARTICIPANT_BASE_URL }}"
+            - name: VITE_USE_PARTICIPANT_ROUTER
+              value: "{{ .Values.participant.env.VITE_USE_PARTICIPANT_ROUTER }}"
+            - name: VITE_DIRECTUS_PUBLIC_URL
+              value: "{{ .Values.frontend.env.VITE_DIRECTUS_PUBLIC_URL }}"
+            - name: VITE_DIRECTUS_CONTENT_PUBLIC_URL
+              value: "{{ .Values.frontend.env.VITE_DIRECTUS_CONTENT_PUBLIC_URL }}"
+          resources:
+            requests:
+              memory: "{{ .Values.frontend.resources.requests.memory }}"
+              cpu: "{{ .Values.frontend.resources.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.frontend.resources.limits.memory }}"
+              cpu: "{{ .Values.frontend.resources.limits.cpu }}"
+{{ end }}
