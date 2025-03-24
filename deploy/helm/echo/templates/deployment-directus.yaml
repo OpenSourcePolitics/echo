@@ -89,9 +89,6 @@ spec:
             - name: SESSION_COOKIE_NAME
               value: '{{ .Values.directus.env.SESSION_COOKIE_NAME }}'
 
-            - name: SESSION_COOKIE_DOMAIN
-              value: '{{ .Values.directus.env.SESSION_COOKIE_DOMAIN }}'
-
             - name: SESSION_COOKIE_SAME_SITE
               value: 'lax'
 

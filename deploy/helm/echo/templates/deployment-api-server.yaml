@@ -83,7 +83,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: echo-backend-secrets
-                  key: DATABASE_URL
+                  key: DATABASE_URL_WORKER
 
             - name: DISABLE_REDACTION
               value: '{{ .Values.apiServer.env.DISABLE_REDACTION }}'
