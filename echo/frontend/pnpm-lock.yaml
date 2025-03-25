@@ -122,11 +122,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      "notifications\n":
-        specifier: |
-          link:@mantine/notifications
-        version: |
-          link:@mantine/notifications
+      notifications:
+        specifier: '@mantine/notifications'
+        version: link:@mantine/notifications
       prettier-plugin-tailwindcss:
         specifier: ^0.6.11
         version: 0.6.11(prettier@3.5.3)
