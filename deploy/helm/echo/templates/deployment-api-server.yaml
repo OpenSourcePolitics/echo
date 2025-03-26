@@ -94,6 +94,9 @@ spec:
             - name: SERVE_API_DOCS
               value: '{{ .Values.apiServer.env.SERVE_API_DOCS }}'
 
+            - name: DISABLE_CORS
+              value: '{{ .Values.apiServer.env.DISABLE_CORS }}'
+
           resources:
             requests:
               cpu: '250m'
