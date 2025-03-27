@@ -24,7 +24,8 @@ _shared_config:
     auth:
       googleClientId: &googleClientId "a"
       googleClientSecret: &googleClientSecret "a"
-    directusCookieName: &directusCookieName "dembrane_session_token_prod"
+    directusCookieName: &directusCookieName "directus_session_token"
+    directusCookieDomain: &directusCookieDomain *frontendHost
     directusMarketplaceTrust: &directusMarketplaceTrust "all"
     directusAdminEmail: &directusAdminEmail ""
     directusAdminPassword: &directusAdminPassword ""
@@ -35,43 +36,26 @@ _shared_config:
     directusEmailSmtpPassword: &directusEmailSmtpPassword ""
     directusEmailSmtpPort: &directusEmailSmtpPort ""
     directusSecret: &directusSecret ""
+    directusUserRegisterAllowList: &directusUserRegisterURLAllowList "https://dashboard.echo.CHANGE_ME.COM/verify-email"
+    directusPasswordResetAllowList: &directusPasswordResetURLAllowList "https://dashboard.echo.CHANGE_ME.COM/password-reset"
+    directusUserInviteAllowList: &directusUserInviteURLAllowList "https://dashboard.echo.CHANGE_ME.COM/invite"
+
   apiServer:
     buildVersion: "1.0.0"
     openaiApiKey: &openaiApiKey "CHANGE_ME"
     anthropicApiKey: &anthropicApiKey "CHANGE_ME"
     corsOrigins: &corsOrigins "https://localhost:8888,https://localhost:3000"
-
+  s3:
+    bucketName: &bucketName "dembrane"
+    bucketRegion: &bucketRegion "fr-par"
+    bucketEndpoint: &bucketEndpoint "https://CHANGE_ME"
+    bucketKey: &bucketKey "CHANGE_ME"
+    bucketSecret: &bucketSecret "CHANGE_ME"
 global:
   imageTag: "1.0.0"
   registry: "rg.fr-par.scw.cloud/dembrane"
   dbConnectionString: ""
   redisUrl: *redisUrl
-
-apiServer:
-  replicaCount: 1
-  image:
-    repository: "rg.fr-par.scw.cloud/dembrane/dbr-server"
-    tag: "1.0.0"
-  service:
-    port: 8000
-  env:
-    ADMIN_BASE_URL: *adminBaseUrl
-    PARTICIPANT_BASE_URL: *participantBaseUrl
-    BUILD_VERSION: "1.0.0"
-    DISABLE_REDACTION: "1"
-    DISABLE_SENTRY: "0"
-    SERVE_API_DOCS: "1"
-    ANTHROPIC_API_KEY: *anthropicApiKey
-    DATABASE_URL: *databaseUrl
-    DATABASE_URL_WORKER: *databaseUrlPsycoPg
-    OPENAI_API_KEY: *openaiApiKey
-    REDIS_URL: *redisUrl
-    RABBITMQ_URL: *rabbitmqUrl
-    DIRECTUS_PUBLIC_URL: *directusPublicUrl
-    DIRECTUS_SECRET: *directusSecret
-    DIRECTUS_TOKEN: *directusAdminToken
-    DIRECTUS_SESSION_COOKIE_NAME: *directusCookieName
-    DISABLE_CORS: "true"
 
 directus:
   replicaCount: 2
@@ -92,8 +76,9 @@ directus:
     CORS_ENABLED: "true"
     CORS_ORIGIN: *corsOrigins
     CORS_CREDENTIALS: "true"
-    SESSION_COOKIE_SAME_SITE: "lax"
-    SESSION_COOKIE_SECURE: "false"
+    SESSION_COOKIE_SAME_SITE: "None"
+    SESSION_COOKIE_SECURE: "true"
+    SESSION_COOKIE_DOMAIN: *directusCookieDomain
     EMAIL_TRANSPORT: "smtp"
     AUTH_GOOGLE_CLIENT_ID: *googleClientId
     AUTH_GOOGLE_CLIENT_SECRET: *googleClientSecret
@@ -107,12 +92,46 @@ directus:
     DIRECTUS_EMAIL_SMTP_PORT: *directusEmailSmtpPort
     DIRECTUS_SECRET: *directusSecret
     DIRECTUS_MARKETPLACE_TRUST: *directusMarketplaceTrust
+    USER_REGISTER_URL_ALLOW_LIST: *directusUserRegisterURLAllowList
+    PASSWORD_RESET_URL_ALLOW_LIST: *directusPasswordResetURLAllowList
+    USER_INVITE_URL_ALLOW_LIST: *directusUserInviteURLAllowList
+
+apiServer:
+  replicaCount: 1
+  image:
+    repository: "rg.fr-par.scw.cloud/dembrane/dbr-server"
+    tag: "1.0.6"
+  service:
+    port: 8000
+  env:
+    ADMIN_BASE_URL: *adminBaseUrl
+    PARTICIPANT_BASE_URL: *participantBaseUrl
+    BUILD_VERSION: "1.0.0"
+    DISABLE_REDACTION: "1"
+    DISABLE_SENTRY: "1"
+    SERVE_API_DOCS: "1"
+    ANTHROPIC_API_KEY: *anthropicApiKey
+    DATABASE_URL: *databaseUrl
+    DATABASE_URL_WORKER: *databaseUrlPsycoPg
+    OPENAI_API_KEY: *openaiApiKey
+    REDIS_URL: *redisUrl
+    RABBITMQ_URL: *rabbitmqUrl
+    DIRECTUS_PUBLIC_URL: *directusPublicUrl
+    DIRECTUS_SECRET: *directusSecret
+    DIRECTUS_TOKEN: *directusAdminToken
+    DIRECTUS_SESSION_COOKIE_NAME: *directusCookieName
+    DISABLE_CORS: "false"
+    STORAGE_S3_BUCKET: *bucketName
+    STORAGE_S3_REGION: *bucketRegion
+    STORAGE_S3_ENDPOINT: *bucketEndpoint
+    STORAGE_S3_KEY: *bucketKey
+    STORAGE_S3_SECRET: *bucketSecret
 
 worker:
   replicaCount: 1
   image:
     repository: "rg.fr-par.scw.cloud/dembrane/dbr-server"
-    tag: "1.0.0"
+    tag: "1.0.6"
   env:
     DIRECTUS_PUBLIC_URL: *directusPublicUrl
     DIRECTUS_SECRET: *directusSecret
@@ -126,9 +145,14 @@ worker:
     REDIS_URL: *redisUrl
     BUILD_VERSION: "1.0.0"
     DISABLE_REDACTION: "1"
-    DISABLE_SENTRY: "0"
+    DISABLE_SENTRY: "1"
     SERVE_API_DOCS: "0"
-    DISABLE_CORS: "true"
+    DISABLE_CORS: "false"
+    STORAGE_S3_BUCKET: *bucketName
+    STORAGE_S3_REGION: *bucketRegion
+    STORAGE_S3_ENDPOINT: *bucketEndpoint
+    STORAGE_S3_KEY: *bucketKey
+    STORAGE_S3_SECRET: *bucketSecret
 
 ingress:
   enabled: true
@@ -209,7 +233,7 @@ frontend:
   enabled: true
   image:
     repository: "rg.fr-par.scw.cloud/dembrane/dbr-frontend"
-    tag: "1.0.8"
+    tag: "1.0.11"
   replicaCount: 1
   service:
     type: ClusterIP
@@ -233,8 +257,8 @@ frontend:
 participant:
   enabled: true
   image:
-    repository: "rg.fr-par.scw.cloud/dembrane/dbr-frontend"
-    tag: "1.0.8"
+    repository: "rg.fr-par.scw.cloud/dembrane/dbr-participant"
+    tag: "1.0.11"
   replicaCount: 1
   service:
     type: ClusterIP

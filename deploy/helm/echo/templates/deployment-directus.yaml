@@ -78,10 +78,10 @@ spec:
                   key: REDIS_URL
 
             - name: CORS_ENABLED
-              value: 'true'
+              value: '{{ .Values.directus.env.CORS_ENABLED }}'
 
             - name: CORS_CREDENTIALS
-              value: "true"
+              value: '{{ .Values.directus.env.CORS_CREDENTIALS }}'
 
             - name: CORS_METHODS
               value: "GET,POST,PUT,PATCH,DELETE,OPTIONS,SEARCH"
@@ -95,17 +95,17 @@ spec:
             - name: CORS_ORIGIN
               value: '{{ .Values.directus.env.CORS_ORIGIN }}'
 
-            - name: DISABLE_CORS
-              value: 'true'
-
             - name: SESSION_COOKIE_NAME
               value: '{{ .Values.directus.env.SESSION_COOKIE_NAME }}'
 
+            - name: SESSION_COOKIE_DOMAIN
+              value: '{{ .Values.directus.env.SESSION_COOKIE_DOMAIN }}'
+
             - name: SESSION_COOKIE_SAME_SITE
-              value: 'lax'
+              value: '{{ .Values.directus.env.SESSION_COOKIE_SAME_SITE }}'
 
             - name: SESSION_COOKIE_SECURE
-              value: 'lax'
+              value: '{{ .Values.directus.env.SESSION_COOKIE_SECURE }}'
 
             - name: EMAIL_TRANSPORT
               value: 'smtp'
