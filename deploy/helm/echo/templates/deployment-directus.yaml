@@ -152,6 +152,9 @@ spec:
             - name: AUTH_PROVIDERS
               value: 'google'
 
+            - name: MARKETPLACE_TRUST
+              value: '{{ .Values.directus.env.MARKETPLACE_TRUST }}'
+
             - name: AUTH_GOOGLE_DRIVER
               value: 'openid'
 

@@ -7,7 +7,7 @@ _shared_config:
   apiUrl: &apiUrl https://api.echo.CHANGE_ME.COM
   frontendUrl: &frontendUrl https://echo.CHANGE_ME.COM
   directusPublicUrl: &directusPublicUrl https://directus.echo.CHANGE_ME.COM
-  dashboardPublicUrl: &adminBaseUrl https://dashboard.echo.CHANGE_ME.COM
+  adminBaseUrl: &adminBaseUrl https://dashboard.echo.CHANGE_ME.COM
   participantBaseUrl: &participantBaseUrl https://portal.echo.CHANGE_ME.COM
   redisUrl: &redisUrl "redis://echo-redis:6379"
   database:
@@ -24,6 +24,8 @@ _shared_config:
     auth:
       googleClientId: &googleClientId "a"
       googleClientSecret: &googleClientSecret "a"
+    directusCookieName: &directusCookieName "dembrane_session_token_prod"
+    directusMarketplaceTrust: &directusMarketplaceTrust "all"
     directusAdminEmail: &directusAdminEmail ""
     directusAdminPassword: &directusAdminPassword ""
     directusAdminToken: &directusAdminToken ""
@@ -37,6 +39,7 @@ _shared_config:
     buildVersion: "1.0.0"
     openaiApiKey: &openaiApiKey "CHANGE_ME"
     anthropicApiKey: &anthropicApiKey "CHANGE_ME"
+    corsOrigins: &corsOrigins "https://localhost:8888,https://localhost:3000"
 
 global:
   imageTag: "1.0.0"
@@ -52,7 +55,6 @@ apiServer:
   service:
     port: 8000
   env:
-    DIRECTUS_PUBLIC_URL: *directusPublicUrl
     ADMIN_BASE_URL: *adminBaseUrl
     PARTICIPANT_BASE_URL: *participantBaseUrl
     BUILD_VERSION: "1.0.0"
@@ -65,16 +67,21 @@ apiServer:
     OPENAI_API_KEY: *openaiApiKey
     REDIS_URL: *redisUrl
     RABBITMQ_URL: *rabbitmqUrl
+    DIRECTUS_PUBLIC_URL: *directusPublicUrl
+    DIRECTUS_SECRET: *directusSecret
+    DIRECTUS_TOKEN: *directusAdminToken
+    DIRECTUS_SESSION_COOKIE_NAME: *directusCookieName
+    DISABLE_CORS: "true"
 
 directus:
   replicaCount: 2
   image:
     repository: "rg.fr-par.scw.cloud/dembrane/dbr-echo-directus"
-    tag: "1.0.0"
+    tag: "1.0.2"
   service:
     port: 8055
   env:
-    SESSION_COOKIE_NAME: "dembrane_session_token_prod"
+    SESSION_COOKIE_NAME: *directusCookieName
     PUBLIC_URL: *directusPublicUrl
     PORT: "8055"
     WEBSOCKETS_ENABLED: "true"
@@ -83,9 +90,10 @@ directus:
     TELEMETRY: "false"
     REDIS_ENABLED: "true"
     CORS_ENABLED: "true"
+    CORS_ORIGIN: *corsOrigins
     CORS_CREDENTIALS: "true"
     SESSION_COOKIE_SAME_SITE: "lax"
-    SESSION_COOKIE_SECURE: "lax"
+    SESSION_COOKIE_SECURE: "false"
     EMAIL_TRANSPORT: "smtp"
     AUTH_GOOGLE_CLIENT_ID: *googleClientId
     AUTH_GOOGLE_CLIENT_SECRET: *googleClientSecret
@@ -98,6 +106,7 @@ directus:
     DIRECTUS_EMAIL_SMTP_PASSWORD: *directusEmailSmtpPassword
     DIRECTUS_EMAIL_SMTP_PORT: *directusEmailSmtpPort
     DIRECTUS_SECRET: *directusSecret
+    DIRECTUS_MARKETPLACE_TRUST: *directusMarketplaceTrust
 
 worker:
   replicaCount: 1
@@ -106,12 +115,20 @@ worker:
     tag: "1.0.0"
   env:
     DIRECTUS_PUBLIC_URL: *directusPublicUrl
+    DIRECTUS_SECRET: *directusSecret
+    DIRECTUS_TOKEN: *directusAdminToken
+    DIRECTUS_SESSION_COOKIE_NAME: *directusCookieName
     ADMIN_BASE_URL: *adminBaseUrl
     PARTICIPANT_BASE_URL: *participantBaseUrl
+    DATABASE_URL: *databaseUrl
+    OPENAI_API_KEY: *openaiApiKey
+    ANTHROPIC_API_KEY: *anthropicApiKey
+    REDIS_URL: *redisUrl
     BUILD_VERSION: "1.0.0"
     DISABLE_REDACTION: "1"
     DISABLE_SENTRY: "0"
     SERVE_API_DOCS: "0"
+    DISABLE_CORS: "true"
 
 ingress:
   enabled: true
@@ -192,7 +209,7 @@ frontend:
   enabled: true
   image:
     repository: "rg.fr-par.scw.cloud/dembrane/dbr-frontend"
-    tag: "1.0.0"
+    tag: "1.0.8"
   replicaCount: 1
   service:
     type: ClusterIP
@@ -217,7 +234,7 @@ participant:
   enabled: true
   image:
     repository: "rg.fr-par.scw.cloud/dembrane/dbr-frontend"
-    tag: "1.0.0"
+    tag: "1.0.8"
   replicaCount: 1
   service:
     type: ClusterIP
