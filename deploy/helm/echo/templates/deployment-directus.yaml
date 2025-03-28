@@ -110,11 +110,32 @@ spec:
             - name: EMAIL_TRANSPORT
               value: 'smtp'
 
+            - name: EMAIL_TEMPLATES_PATH
+              value: './templates'
+
+            - name: EMAIL_VERIFY_SETUP
+              valueFrom:
+                secretKeyRef:
+                  name: echo-backend-secrets
+                  key: DIRECTUS_EMAIL_VERIFY_SETUP
+
+            - name: EMAIL_SMTP_SECURE
+              valueFrom:
+                secretKeyRef:
+                  name: echo-backend-secrets
+                  key: DIRECTUS_EMAIL_SMTP_SECURE
+
             - name: EMAIL_FROM
               valueFrom:
                 secretKeyRef:
                   name: echo-backend-secrets
                   key: DIRECTUS_EMAIL_FROM
+
+            - name: EMAIL_SMTP_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: echo-backend-secrets
+                  key: DIRECTUS_EMAIL_SMTP_HOST
 
             - name: EMAIL_SMTP_HOST
               valueFrom:

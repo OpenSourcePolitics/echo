@@ -25,7 +25,7 @@ _shared_config:
       googleClientId: &googleClientId "a"
       googleClientSecret: &googleClientSecret "a"
     directusCookieName: &directusCookieName "directus_session_token"
-    directusCookieDomain: &directusCookieDomain *frontendHost
+    directusCookieDomain: &directusCookieDomain ".echo.CHANGE_ME.COM"
     directusMarketplaceTrust: &directusMarketplaceTrust "all"
     directusAdminEmail: &directusAdminEmail ""
     directusAdminPassword: &directusAdminPassword ""
@@ -35,6 +35,8 @@ _shared_config:
     directusEmailSmtpUser: &directusEmailSmtpUser ""
     directusEmailSmtpPassword: &directusEmailSmtpPassword ""
     directusEmailSmtpPort: &directusEmailSmtpPort ""
+    directusEmailSmtpSecure: &directusEmailSmtpSecure "false"
+    directusEmailVerifySetup: &directusEmailVerifySetup "true"
     directusSecret: &directusSecret ""
     directusUserRegisterAllowList: &directusUserRegisterURLAllowList "https://dashboard.echo.CHANGE_ME.COM/verify-email"
     directusPasswordResetAllowList: &directusPasswordResetURLAllowList "https://dashboard.echo.CHANGE_ME.COM/password-reset"
@@ -54,7 +56,6 @@ _shared_config:
 global:
   imageTag: "1.0.0"
   registry: "rg.fr-par.scw.cloud/dembrane"
-  dbConnectionString: ""
   redisUrl: *redisUrl
 
 directus:
@@ -90,6 +91,8 @@ directus:
     DIRECTUS_EMAIL_SMTP_USER: *directusEmailSmtpUser
     DIRECTUS_EMAIL_SMTP_PASSWORD: *directusEmailSmtpPassword
     DIRECTUS_EMAIL_SMTP_PORT: *directusEmailSmtpPort
+    DIRECTUS_EMAIL_VERIFY_SETUP: *directusEmailVerifySetup
+    DIRECTUS_EMAIL_SMTP_SECURE: *directusEmailSmtpSecure
     DIRECTUS_SECRET: *directusSecret
     DIRECTUS_MARKETPLACE_TRUST: *directusMarketplaceTrust
     USER_REGISTER_URL_ALLOW_LIST: *directusUserRegisterURLAllowList
