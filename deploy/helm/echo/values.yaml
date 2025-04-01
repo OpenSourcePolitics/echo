@@ -261,7 +261,7 @@ participant:
   enabled: true
   image:
     repository: "rg.fr-par.scw.cloud/dembrane/dbr-participant"
-    tag: "1.0.11"
+    tag: "1.0.15"
   replicaCount: 1
   service:
     type: ClusterIP

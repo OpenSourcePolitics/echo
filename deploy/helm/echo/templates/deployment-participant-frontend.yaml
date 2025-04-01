@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          image: "{{ .Values.participant.image.repository }}:{{ .Values.participant.image.tag }}"
           ports:
             - containerPort: 5173
           env:
