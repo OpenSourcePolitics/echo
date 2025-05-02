@@ -1,0 +1,32 @@
+{{ if .Values.postgresql.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: "{{ .Values.postgresql.postgresqlUsername }}"
+            - name: POSTGRES_PASSWORD
+              value: "{{ .Values.postgresql.postgresqlPassword }}"
+            - name: POSTGRES_DB
+              value: "{{ .Values.postgresql.postgresqlDatabase }}"
+      volumes:
+        - name: postgresql-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-postgresql-pvc
+{{ end }}

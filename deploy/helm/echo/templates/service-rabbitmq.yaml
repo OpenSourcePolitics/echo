@@ -1,0 +1,15 @@
+{{ if .Values.rabbitmq.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-rabbitmq
+spec:
+  type: {{ .Values.rabbitmq.service.type }}
+  ports:
+    - port: {{ .Values.rabbitmq.service.port }}
+      name: amqp
+    - port: {{ .Values.rabbitmq.service.managementPort }}
+      name: management
+  selector:
+    app: rabbitmq
+{{ end }}
