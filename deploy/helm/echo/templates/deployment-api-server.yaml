@@ -28,6 +28,8 @@ spec:
           ports:
             - containerPort: {{ .Values.apiServer.service.port }}
           env:
+            - name: DIRECTUS_BASE_URL
+              value: '{{ .Values.apiServer.env.DIRECTUS_BASE_URL }}'
             - name: DIRECTUS_PUBLIC_URL
               value: '{{ .Values.apiServer.env.DIRECTUS_PUBLIC_URL }}'
 
@@ -111,6 +113,9 @@ spec:
 
             - name: STORAGE_S3_SECRET
               value: '{{ .Values.apiServer.env.STORAGE_S3_SECRET }}'
+
+            - name: DEBUG_MODE
+              value: '{{ .Values.apiServer.env.DEBUG_MODE }}'
           resources:
             requests:
               cpu: '250m'

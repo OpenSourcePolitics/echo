@@ -93,19 +93,19 @@ spec:
               value: "Content-Type,Content-Range,X-Total-Count"
 
             - name: CORS_ORIGIN
-              value: '{{ .Values.directus.env.CORS_ORIGIN }}'
+              value: '{{ .Values.directus.env.CORS_ORIGIN | quote }}'
 
             - name: SESSION_COOKIE_NAME
-              value: '{{ .Values.directus.env.SESSION_COOKIE_NAME }}'
+              value: '{{ .Values.directus.env.SESSION_COOKIE_NAME | quote }}'
 
             - name: SESSION_COOKIE_DOMAIN
-              value: '{{ .Values.directus.env.SESSION_COOKIE_DOMAIN }}'
+              value: '{{ .Values.directus.env.SESSION_COOKIE_DOMAIN | quote }}'
 
             - name: SESSION_COOKIE_SAME_SITE
-              value: '{{ .Values.directus.env.SESSION_COOKIE_SAME_SITE }}'
+              value: '{{ .Values.directus.env.SESSION_COOKIE_SAME_SITE | quote }}'
 
             - name: SESSION_COOKIE_SECURE
-              value: '{{ .Values.directus.env.SESSION_COOKIE_SECURE }}'
+              value: '{{ .Values.directus.env.SESSION_COOKIE_SECURE | quote }}'
 
             - name: EMAIL_TRANSPORT
               value: 'smtp'
@@ -162,7 +162,7 @@ spec:
                   key: DIRECTUS_EMAIL_SMTP_PASSWORD
 
             - name: USER_REGISTER_URL_ALLOW_LIST
-              value: '{{ .Values.directus.env.USER_REGISTER_URL_ALLOW_LIST }}'
+              value: '{{ .Values.directus.env.USER_REGISTER_URL_ALLOW_LIST | quote }}'
 
             - name: PASSWORD_RESET_URL_ALLOW_LIST
               value: '{{ .Values.directus.env.PASSWORD_RESET_URL_ALLOW_LIST }}'
