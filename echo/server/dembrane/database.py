@@ -38,7 +38,7 @@ logger = getLogger("database")
 # Create the engine and connect to the SQLite database file
 assert DATABASE_URL is not None
 logger.debug(f"Connecting to database: {DATABASE_URL}")
-engine = create_engine(DATABASE_URL)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 # Create a session factory
 session_factory = sessionmaker(bind=engine)
